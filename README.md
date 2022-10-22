@@ -1,5 +1,11 @@
 Basic Canvas Outpainting Test.
 ===============================
+Script for AUTOMATIC1111/stable-diffusion-webui to allow for easier outpainting.
+I have used the two existing outpainting scripts from the AUTOMATIC1111 as a basis.
+
+Installation:
+Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable-diffusion-webui
+
 + supports selection of region to expand with x/y coords in the current src Image.
 + supports selection of the same x/y coord via canvas selection.
 + Image is expanded to the new dimensions before processing. (empty = black)
