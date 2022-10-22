@@ -1,7 +1,7 @@
 Basic Canvas Outpainting Test.
 ===============================
 Script for AUTOMATIC1111/stable-diffusion-webui to allow for easier outpainting.
-I have used the two existing outpainting scripts from the AUTOMATIC1111 as a basis.
+I have used the two existing outpainting scripts from the AUTOMATIC1111 repo as a basis.
 
 Installation:
 Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable-diffusion-webui
