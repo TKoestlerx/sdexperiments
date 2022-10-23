@@ -134,11 +134,11 @@ class Script(scripts.Script):
         canvasButton.click(None, [], dummy, _js="(x) => {   let grap = document.body.children[0];\
                                                             let tabDiv = grap.shadowRoot.getElementById('tab_img2img');\
                                                             let img2imgDiv = grap.shadowRoot.getElementById('img2img_image');\
-                                                            let imgB64 = img2imgDiv.children[2].children[0].children[1].src;\
+                                                            let imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';\
                                                             let canvDiv = grap.shadowRoot.getElementById('outDrawCanvasDiv');\
                                                             let canv = grap.shadowRoot.getElementById('outDrawCanvas');\
-                                                            console.info('run',canvDiv);\
                                                             if (!canvDiv) {\
+                                                              console.info('first run. create Canvas.');\
                                                               canvDiv = document.createElement('div');\
                                                               canvDiv.id = 'outDrawCanvasDiv';\
                                                               canv = document.createElement('canvas');\
@@ -177,7 +177,6 @@ class Script(scripts.Script):
                                                                 grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));\
                                                               }\
                                                             }\
-                                                            console.info(canvDiv.style.display);\
                                                             if (canvDiv.style.display!=='none') {\
                                                               canvDiv.style.display = 'none';\
                                                               return 0;\
@@ -211,7 +210,10 @@ class Script(scripts.Script):
                                                                     }\
                                                                   }\
                                                                 }\
-                                                                if (lastX<firstX || lastY < firstY) return 0;\
+                                                                if (lastX<firstX || lastY < firstY) {\
+                                                                  console.info('no data found in Image');\
+                                                                  return 0;\
+                                                                }\
                                                                 canv.width = (lastX - firstX) + 800;\
                                                                 canv.style.width = canv.width + 'px';\
                                                                 canv.height = (lastY - firstY) + 800;\
@@ -229,7 +231,9 @@ class Script(scripts.Script):
                                                               };\
                                                               console.info('loading image');\
                                                               image.src = imgB64;\
+                                                              return 0;\
                                                             };\
+                                                            console.info('failed to get Image data');\
                                                             return 0}")
         return [leftcoord, topcoord,canvasButton,dummy]
 
