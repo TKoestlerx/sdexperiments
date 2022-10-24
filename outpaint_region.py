@@ -131,110 +131,208 @@ class Script(scripts.Script):
         topcoord = gr.Slider(label="top start coord", minimum=-400, maximum=2048, step=1, value=0, elem_id="topCoord")
         dummy = gr.Slider(label="unused", minimum=-1, maximum=1, step=1, value=0)
         
-        canvasButton.click(None, [], dummy, _js="(x) => {   let grap = document.body.children[0];\
-                                                            let tabDiv = grap.shadowRoot.getElementById('tab_img2img');\
-                                                            let img2imgDiv = grap.shadowRoot.getElementById('img2img_image');\
-                                                            let imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';\
-                                                            let canvDiv = grap.shadowRoot.getElementById('outDrawCanvasDiv');\
-                                                            let canv = grap.shadowRoot.getElementById('outDrawCanvas');\
-                                                            if (!canvDiv) {\
-                                                              console.info('first run. create Canvas.');\
-                                                              canvDiv = document.createElement('div');\
-                                                              canvDiv.id = 'outDrawCanvasDiv';\
-                                                              canv = document.createElement('canvas');\
-                                                              canv.id = 'outDrawCanvas';\
-                                                              canvDiv.append(canv);\
-                                                              tabDiv.append(canvDiv);\
-                                                              canvDiv.style.display = 'none';\
-                                                              canvDiv.style.position = 'absolute';\
-                                                              canvDiv.style.left = '50px';\
-                                                              canvDiv.style.right = '50px';\
-                                                              canvDiv.style.top = '50px';\
-                                                              canvDiv.style.bottom = '50px';\
-                                                              canvDiv.style.zIndex = '1000';\
-                                                              canvDiv.style.background = '#d0d0d0';\
-                                                              canvDiv.style.overflow = 'auto';\
-                                                              canv.onclick = function(event) {\
-                                                                event.stopPropagation();\
-                                                                let rect = canv.getBoundingClientRect();\
-                                                                let x = event.clientX - rect.left;\
-                                                                let y = event.clientY - rect.top;\
-                                                                if (x>canv.width-512 || y>canv.height-512) return;\
-                                                                let ctx = canv.getContext('2d');\
-                                                                ctx.fillStyle = 'black';\
-                                                                ctx.fillRect(0, 0, canv.width, canv.height);\
-                                                                ctx.drawImage(canv.storeImage, 400, 400, canv.width-800, canv.height-800);\
-                                                                ctx.beginPath();\
-                                                                ctx.lineWidth = '2';\
-                                                                ctx.strokeStyle = 'white';\
-                                                                ctx.rect(x, y, 512, 512);\
-                                                                ctx.stroke();\
-                                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].value = x - 400;\
-                                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[1].value = x - 400;\
-                                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].value = y -400;\
-                                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[1].value = y - 400;\
-                                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));\
-                                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));\
-                                                              }\
-                                                            }\
-                                                            if (canvDiv.style.display!=='none') {\
-                                                              canvDiv.style.display = 'none';\
-                                                              return 0;\
-                                                            }\
-                                                            if (canv && imgB64) {\
-                                                              let ctx = canv.getContext('2d');\
-                                                              let image = new Image();\
-                                                              image.onload = function() {\
-                                                                console.info('onLoad');\
-                                                                canv.width = this.width;\
-                                                                canv.height = this.height;\
-                                                                ctx.drawImage(this, 0, 0);\
-                                                                let pixelData = ctx.getImageData(0, 0, canv.width, canv.height).data;\
-                                                                let firstX = 9999;\
-                                                                let firstY = 9999;\
-                                                                let lastX = 0;\
-                                                                let lastY = 0;\
-                                                                for (let y=0;y<this.height;y=y+10) {\
-                                                                  for (let x=0;x<this.width;x++) {\
-                                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {\
-                                                                      if (x<firstX) firstX = x;\
-                                                                      if (x>lastX) lastX = x;\
-                                                                    }\
-                                                                  }\
-                                                                }\
-                                                                for (let x=0;x<this.width;x=x+10) {\
-                                                                  for (let y=0;y<this.height;y++) {\
-                                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {\
-                                                                      if (y<firstY) firstY = y;\
-                                                                      if (y>lastY) lastY = y;\
-                                                                    }\
-                                                                  }\
-                                                                }\
-                                                                if (lastX<firstX || lastY < firstY) {\
-                                                                  console.info('no data found in Image');\
-                                                                  return 0;\
-                                                                }\
-                                                                canv.width = (lastX - firstX) + 800;\
-                                                                canv.style.width = canv.width + 'px';\
-                                                                canv.height = (lastY - firstY) + 800;\
-                                                                canv.style.height = canv.height + 'px';\
-                                                                ctx.fillStyle = 'black';\
-                                                                ctx.fillRect(0, 0, canv.width, canv.height);\
-                                                                ctx.drawImage(image, 400, 400, (lastX - firstX), (lastY - firstY));\
-                                                                canvDiv.style.display = 'block';\
-                                                                canvDiv.style.position = 'fixed';\
-                                                                canvDiv.style.left = '400px';\
-                                                                canvDiv.style.width = 'calc(100% - 400px)';\
-                                                                canvDiv.style.top = '0px';\
-                                                                canvDiv.style.height = '100%';\
-                                                                canv.storeImage = this; \
-                                                              };\
-                                                              console.info('loading image');\
-                                                              image.src = imgB64;\
-                                                              return 0;\
-                                                            };\
-                                                            console.info('failed to get Image data');\
-                                                            return 0}")
+        javaScriptFunction = """(x) => {    let grap = document.body.children[0];
+                                            let tabDiv = grap.shadowRoot.getElementById('tab_img2img');
+                                            let img2imgDiv = grap.shadowRoot.getElementById('img2img_image');
+                                            let imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';
+                                            let canvDiv = grap.shadowRoot.getElementById('outDrawCanvasDiv');
+                                            let canv = grap.shadowRoot.getElementById('outDrawCanvas');
+                                            if (!canvDiv) {
+                                              console.info('first run. create Canvas.');
+                                              function dragElement(elmnt,nn) {
+                                                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, pos5 = 0, pos6 = 0;
+                                                if ( grap.shadowRoot.getElementById(nn)) {
+                                                   grap.shadowRoot.getElementById(nn).onmousedown = dragMouseDown;
+                                                } else {
+                                                  elmnt.onmousedown = dragMouseDown;
+                                                }
+                                                function dragMouseDown(e) {
+                                                  e = e || window.event;
+                                                  let totalOffsetX = 0; let totalOffsetY = 0;
+                                                  let currentElement = elmnt;
+                                                  do{
+                                                    totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+                                                    totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+                                                  }
+                                                  while(currentElement = currentElement.offsetParent)
+                                                  let mpos_x = e.pageX - totalOffsetX;
+                                                  let mpos_y = e.pageY - totalOffsetY;
+                                                  pos3 = e.clientX;
+                                                  pos4 = e.clientY;
+                                                  e.preventDefault();
+                                                  pos5 = elmnt.offsetTop;
+                                                  pos6 = elmnt.offsetLeft;
+                                                  document.onmouseup = closeDragElement;
+                                                  document.onmousemove = elementDrag;
+                                                  e.preventDefault();
+                                                }
+                                                function elementDrag(e) {
+                                                  e = e || window.event;
+                                                  e.preventDefault();
+                                                  pos1 = pos3 - e.clientX+5;
+                                                  pos2 = pos4 - e.clientY+5;
+                                                  if (pos5 - pos2 > 0) {
+                                                    elmnt.style.top = (pos5 - pos2) + 'px';
+                                                  }
+                                                  elmnt.style.left = (pos6 - pos1) + 'px';
+                                                }
+                                                function closeDragElement() {
+                                                  document.onmouseup = null;
+                                                  document.onmousemove = null;
+                                                }
+                                              }
+                                              canvDiv = document.createElement('div');
+                                              canvDiv.id = 'outDrawCanvasDiv';
+                                              titleDiv = document.createElement('div');
+                                              titleDiv.id = 'outDrawCanvasTitle';
+                                              titleDiv.innerHTML = 'outpainting Canvas';
+                                              titleDiv.style.left = '0px';
+                                              titleDiv.style.top = '0px';
+                                              titleDiv.style.right = '150px';
+                                              titleDiv.style.height = '30px';
+                                              titleDiv.style.display = 'block';
+                                              titleDiv.style.position = 'absolute';
+                                              canvDiv.append(titleDiv);
+                                              closeDiv = document.createElement('div');
+                                              closeDiv.id = 'outDrawCanvasCloser';
+                                              closeDiv.innerHTML = 'Close';
+                                              closeDiv.style.right = '0px';
+                                              closeDiv.style.top = '0px';
+                                              closeDiv.style.width = '75px';
+                                              closeDiv.style.height = '30px';
+                                              closeDiv.style.display = 'block';
+                                              closeDiv.style.position = 'absolute';
+                                              closeDiv.onclick = function(event) {
+                                                canvDiv.style.display = 'none';
+                                              }
+                                              canvDiv.append(closeDiv);
+                                              refreshDiv = document.createElement('div');
+                                              refreshDiv.id = 'outDrawCanvasUpdate';
+                                              refreshDiv.innerHTML = 'Update';
+                                              refreshDiv.style.right = '75px';
+                                              refreshDiv.style.top = '0px';
+                                              refreshDiv.style.width = '75px';
+                                              refreshDiv.style.height = '30px';
+                                              refreshDiv.style.display = 'block';
+                                              refreshDiv.style.position = 'absolute';
+                                              refreshDiv.onclick = function(event) {
+                                                imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';
+                                                updateImage();
+                                              }
+                                              canvDiv.append(refreshDiv);
+                                              containerDiv = document.createElement('div');
+                                              containerDiv.style.left = '0px';
+                                              containerDiv.style.top = '30px';
+                                              containerDiv.style.right = '0px';
+                                              containerDiv.style.bottom = '0px';
+                                              containerDiv.style.display = 'block'
+                                              containerDiv.style.position = 'absolute';
+                                              containerDiv.style.overflow = 'auto';
+                                              canv = document.createElement('canvas');
+                                              canv.id = 'outDrawCanvas';
+                                              canv.style.left = '0px';
+                                              canv.style.top = '0px';
+                                              containerDiv.append(canv);
+                                              canvDiv.append(containerDiv);
+                                              tabDiv.append(canvDiv);
+                                              canvDiv.style.display = 'none';
+                                              canvDiv.style.position = 'absolute';
+                                              canvDiv.style.minWidth = '400px';
+                                              canvDiv.style.minHeight = '200px';
+                                              canvDiv.style.right = '50px';
+                                              canvDiv.style.top = '50px';
+                                              canvDiv.style.height = '500px';
+                                              canvDiv.style.zIndex = '1000';
+                                              canvDiv.style.background = '#d0d0d0';
+                                              canvDiv.style.overflow = 'hidden';
+                                              canvDiv.style.resize = 'both';
+                                              dragElement(canvDiv,'outDrawCanvasTitle');
+                                              canv.onclick = function(event) {
+                                                event.stopPropagation();
+                                                let rect = canv.getBoundingClientRect();
+                                                let x = event.clientX - rect.left;
+                                                let y = event.clientY - rect.top;
+                                                if (x>canv.width-512 || y>canv.height-512) return;
+                                                let ctx = canv.getContext('2d');
+                                                ctx.fillStyle = 'black';
+                                                ctx.fillRect(0, 0, canv.width, canv.height);
+                                                ctx.drawImage(canv.storeImage, 400, 400, canv.width-800, canv.height-800);
+                                                ctx.beginPath();
+                                                ctx.lineWidth = '2';
+                                                ctx.strokeStyle = 'white';
+                                                ctx.rect(x, y, 512, 512);
+                                                ctx.stroke();
+                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].value = x - 400;
+                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[1].value = x - 400;
+                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].value = y -400;
+                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[1].value = y - 400;
+                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));
+                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));
+                                              }
+                                            }
+                                            if (canvDiv.style.display!=='none') {
+                                              canvDiv.style.display = 'none';
+                                              return 0;
+                                            }
+                                            function updateImage() {
+                                              let ctx = canv.getContext('2d');
+                                              let image = new Image();
+                                              image.onload = function() {
+                                                console.info('onLoad');
+                                                canv.width = this.width;
+                                                canv.height = this.height;
+                                                ctx.drawImage(this, 0, 0);
+                                                let pixelData = ctx.getImageData(0, 0, canv.width, canv.height).data;
+                                                let firstX = 9999;
+                                                let firstY = 9999;
+                                                let lastX = 0;
+                                                let lastY = 0;
+                                                for (let y=0;y<this.height;y=y+10) {
+                                                  for (let x=0;x<this.width;x++) {
+                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {
+                                                      if (x<firstX) firstX = x;
+                                                      if (x>lastX) lastX = x;
+                                                    }
+                                                  }
+                                                }
+                                                for (let x=0;x<this.width;x=x+10) {
+                                                  for (let y=0;y<this.height;y++) {
+                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {
+                                                      if (y<firstY) firstY = y;
+                                                      if (y>lastY) lastY = y;
+                                                    }
+                                                  }
+                                                }
+                                                if (lastX<firstX || lastY < firstY) {
+                                                  console.info('no data found in Image');
+                                                  return 0;
+                                                }
+                                                canv.width = (lastX - firstX) + 800;
+                                                canv.style.width = canv.width + 'px';
+                                                canv.height = (lastY - firstY) + 800;
+                                                canv.style.height = canv.height + 'px';
+                                                ctx.fillStyle = 'black';
+                                                ctx.fillRect(0, 0, canv.width, canv.height);
+                                                ctx.drawImage(image, 400, 400, (lastX - firstX), (lastY - firstY));
+                                                canvDiv.style.display = 'block';
+                                                canvDiv.style.position = 'fixed';
+                                                canvDiv.style.left = '400px';
+                                                canvDiv.style.width = '800px';
+                                                canvDiv.style.top = '0px';
+                                                canvDiv.style.height = '50%';
+                                                canv.storeImage = this; 
+                                              };
+                                              console.info('loading image');
+                                              image.src = imgB64;
+                                              return 0;
+                                            };
+                                            if (canv && imgB64) {
+                                              updateImage();
+                                            } else {
+                                              console.info('failed to get Image data');
+                                            }
+                                            return 0}"""
+        canvasButton.click(None, [], dummy, _js = javaScriptFunction)
         return [leftcoord, topcoord,canvasButton,dummy]
 
     def run(self, p, leftcoord, topcoord,canvasButton,dummy):
