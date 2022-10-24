@@ -186,7 +186,7 @@ class Script(scripts.Script):
                                               titleDiv = document.createElement('div');
                                               titleDiv.id = 'outDrawCanvasTitle';
                                               titleDiv.innerHTML = 'outpainting Canvas';
-                                              titleDiv.style.left = '0px';
+                                              titleDiv.style.left = '30px';
                                               titleDiv.style.top = '0px';
                                               titleDiv.style.right = '150px';
                                               titleDiv.style.height = '30px';
@@ -220,6 +220,25 @@ class Script(scripts.Script):
                                                 updateImage();
                                               }
                                               canvDiv.append(refreshDiv);
+                                              positionDiv = document.createElement('div');
+                                              positionDiv.innerHTML = 'pos: Fixed';
+                                              positionDiv.style.left = '0px';
+                                              positionDiv.style.top = '0px';
+                                              positionDiv.style.width = '30px';
+                                              positionDiv.style.height = '30px';
+                                              positionDiv.style.display = 'block';
+                                              positionDiv.style.position = 'absolute';
+                                              positionDiv.onclick = function(event) {
+                                                if (canvDiv.style.position==='absolute') {
+                                                  canvDiv.style.position = 'fixed';
+                                                  canvDiv.style.top = '100px';
+                                                  positionDiv.innerHTML = 'F';
+                                                } else {
+                                                  canvDiv.style.position = 'absolute';
+                                                  positionDiv.innerHTML = 'A';
+                                                }
+                                              }
+                                              canvDiv.append(positionDiv);
                                               containerDiv = document.createElement('div');
                                               containerDiv.style.left = '0px';
                                               containerDiv.style.top = '30px';
@@ -260,6 +279,8 @@ class Script(scripts.Script):
                                                 ctx.beginPath();
                                                 ctx.lineWidth = '2';
                                                 ctx.strokeStyle = 'white';
+                                                x = Math.floor(x);
+                                                y = Math.floor(y);
                                                 ctx.rect(x, y, 512, 512);
                                                 ctx.stroke();
                                                 grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].value = x - 400;
@@ -281,6 +302,7 @@ class Script(scripts.Script):
                                               canvDiv.style.width = '800px';
                                               canvDiv.style.top = '0px';
                                               canvDiv.style.height = '50%';
+                                              positionDiv.innerHTML = 'F';
                                             }
                                             function updateImage() {
                                               let ctx = canv.getContext('2d');
