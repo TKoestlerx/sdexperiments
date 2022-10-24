@@ -23,7 +23,22 @@ Set the denoising strength to a high value (1.0)
 But, i have a lot of fun playing around with it :)
 
 
-The Ui:
+The UI
+
+======
+
+Newer Version(branch: windowedcanvas)
+
++window is draggable
+
++window is resizeable
+
++window has update/close buttons
+
+![windowed](https://user-images.githubusercontent.com/86352149/197577511-63bed66e-3cc0-4077-8d01-bd38c6fede19.jpg)
+
+
+Older Version (branch:main)
 
 ![canv01](https://user-images.githubusercontent.com/86352149/197335086-bd793e1b-58cd-482a-818c-42a34fd1c4ef.jpg)
 
