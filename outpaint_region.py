@@ -339,8 +339,8 @@ class Script(scripts.Script):
         return [leftcoord, topcoord,canvasButton,dummy]
 
     def run(self, p, leftcoord, topcoord,canvasButton,dummy):
-        initial_seed = None
-        initial_info = None
+        leftcoord = int(leftcoord)
+        topcoord = int(topcoord)
         p.mask_blur = 0
         p.inpaint_full_res = False
         p.do_not_save_samples = True
