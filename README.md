@@ -23,18 +23,16 @@ Set the denoising strength to a high value (1.0)
 But, i have a lot of fun playing around with it :)
 
 
-The Ui:
+The UI
 
-![canv01](https://user-images.githubusercontent.com/86352149/197335086-bd793e1b-58cd-482a-818c-42a34fd1c4ef.jpg)
+======
 
-Click on show/hide will open the canvas:
+Newer Version(branch: windowedcanvas)
 
-![canv02](https://user-images.githubusercontent.com/86352149/197335135-cf0f5aff-85fa-4c45-9088-e6f3a938e565.jpg)
++window is draggable
 
-If you are good with one of the resulting images just copy it over as the new src (send to img2img):
++window is resizeable
 
-![canv03](https://user-images.githubusercontent.com/86352149/197335228-e4ea1559-c609-498b-b797-3c98c4be009a.jpg)
++window has update/close buttons
 
-And repeat....
-
-![canv04](https://user-images.githubusercontent.com/86352149/197335278-5624a152-82bb-4c51-8e09-647dd14fefb9.jpg)
+![windowed](https://user-images.githubusercontent.com/86352149/197577511-63bed66e-3cc0-4077-8d01-bd38c6fede19.jpg)
