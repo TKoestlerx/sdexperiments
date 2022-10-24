@@ -274,6 +274,14 @@ class Script(scripts.Script):
                                               canvDiv.style.display = 'none';
                                               return 0;
                                             }
+                                            function resetView() {
+                                              canvDiv.style.display = 'block';
+                                              canvDiv.style.position = 'fixed';
+                                              canvDiv.style.left = '400px';
+                                              canvDiv.style.width = '800px';
+                                              canvDiv.style.top = '0px';
+                                              canvDiv.style.height = '50%';
+                                            }
                                             function updateImage() {
                                               let ctx = canv.getContext('2d');
                                               let image = new Image();
@@ -314,12 +322,6 @@ class Script(scripts.Script):
                                                 ctx.fillStyle = 'black';
                                                 ctx.fillRect(0, 0, canv.width, canv.height);
                                                 ctx.drawImage(image, 400, 400, (lastX - firstX), (lastY - firstY));
-                                                canvDiv.style.display = 'block';
-                                                canvDiv.style.position = 'fixed';
-                                                canvDiv.style.left = '400px';
-                                                canvDiv.style.width = '800px';
-                                                canvDiv.style.top = '0px';
-                                                canvDiv.style.height = '50%';
                                                 canv.storeImage = this; 
                                               };
                                               console.info('loading image');
@@ -328,6 +330,7 @@ class Script(scripts.Script):
                                             };
                                             if (canv && imgB64) {
                                               updateImage();
+                                              resetView();
                                             } else {
                                               console.info('failed to get Image data');
                                             }
