@@ -117,7 +117,7 @@ def get_matched_noise(_np_src_image, np_mask_rgb, noise_q=1, color_variation=0.0
 
 class Script(scripts.Script):
     def title(self):
-        return "Outpaint Canvas Region"
+        return "Alpha Canvas"
 
     def show(self, is_img2img):
         return is_img2img
@@ -126,270 +126,427 @@ class Script(scripts.Script):
         if not is_img2img:
             return None
 
-        canvasButton = gr.Button("Show/Hide Canvas")
-        leftcoord = gr.Slider(label="Left start coord", minimum=-400, maximum=2048, step=1, value=0, elem_id="leftCoord")
-        topcoord = gr.Slider(label="top start coord", minimum=-400, maximum=2048, step=1, value=0, elem_id="topCoord")
-        dummy = gr.Slider(label="unused", minimum=-1, maximum=1, step=1, value=0)
+        canvasButton = gr.Button("Show/Hide AlphaCanvas")
+        dummy = gr.Slider(label="", minimum=-1, maximum=1, step=1, value=0)
         
-        javaScriptFunction = """(x) => {    let grap = document.body.children[0];
-                                            let tabDiv = grap.shadowRoot.getElementById('tab_img2img');
-                                            let img2imgDiv = grap.shadowRoot.getElementById('img2img_image');
-                                            let imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';
-                                            let canvDiv = grap.shadowRoot.getElementById('outDrawCanvasDiv');
-                                            let canv = grap.shadowRoot.getElementById('outDrawCanvas');
-                                            if (!canvDiv) {
-                                              console.info('first run. create Canvas.');
-                                              function dragElement(elmnt,nn) {
-                                                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, pos5 = 0, pos6 = 0;
-                                                if ( grap.shadowRoot.getElementById(nn)) {
-                                                   grap.shadowRoot.getElementById(nn).onmousedown = dragMouseDown;
-                                                } else {
-                                                  elmnt.onmousedown = dragMouseDown;
-                                                }
-                                                function dragMouseDown(e) {
-                                                  e = e || window.event;
-                                                  let totalOffsetX = 0; let totalOffsetY = 0;
-                                                  let currentElement = elmnt;
-                                                  do{
-                                                    totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
-                                                    totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
-                                                  }
-                                                  while(currentElement = currentElement.offsetParent)
-                                                  let mpos_x = e.pageX - totalOffsetX;
-                                                  let mpos_y = e.pageY - totalOffsetY;
-                                                  pos3 = e.clientX;
-                                                  pos4 = e.clientY;
-                                                  e.preventDefault();
-                                                  pos5 = elmnt.offsetTop;
-                                                  pos6 = elmnt.offsetLeft;
-                                                  document.onmouseup = closeDragElement;
-                                                  document.onmousemove = elementDrag;
-                                                  e.preventDefault();
-                                                }
-                                                function elementDrag(e) {
-                                                  e = e || window.event;
-                                                  e.preventDefault();
-                                                  pos1 = pos3 - e.clientX+5;
-                                                  pos2 = pos4 - e.clientY+5;
-                                                  if (pos5 - pos2 > 0) {
-                                                    elmnt.style.top = (pos5 - pos2) + 'px';
-                                                  }
-                                                  elmnt.style.left = (pos6 - pos1) + 'px';
-                                                }
-                                                function closeDragElement() {
-                                                  document.onmouseup = null;
-                                                  document.onmousemove = null;
-                                                }
-                                              }
-                                              canvDiv = document.createElement('div');
-                                              canvDiv.id = 'outDrawCanvasDiv';
-                                              titleDiv = document.createElement('div');
-                                              titleDiv.id = 'outDrawCanvasTitle';
-                                              titleDiv.innerHTML = 'outpainting Canvas';
-                                              titleDiv.style.left = '30px';
-                                              titleDiv.style.top = '0px';
-                                              titleDiv.style.right = '150px';
-                                              titleDiv.style.height = '30px';
-                                              titleDiv.style.display = 'block';
-                                              titleDiv.style.position = 'absolute';
-                                              canvDiv.append(titleDiv);
-                                              closeDiv = document.createElement('div');
-                                              closeDiv.id = 'outDrawCanvasCloser';
-                                              closeDiv.innerHTML = 'Close';
-                                              closeDiv.style.right = '0px';
-                                              closeDiv.style.top = '0px';
-                                              closeDiv.style.width = '75px';
-                                              closeDiv.style.height = '30px';
-                                              closeDiv.style.display = 'block';
-                                              closeDiv.style.position = 'absolute';
-                                              closeDiv.onclick = function(event) {
-                                                canvDiv.style.display = 'none';
-                                              }
-                                              canvDiv.append(closeDiv);
-                                              refreshDiv = document.createElement('div');
-                                              refreshDiv.id = 'outDrawCanvasUpdate';
-                                              refreshDiv.innerHTML = 'Update';
-                                              refreshDiv.style.right = '75px';
-                                              refreshDiv.style.top = '0px';
-                                              refreshDiv.style.width = '75px';
-                                              refreshDiv.style.height = '30px';
-                                              refreshDiv.style.display = 'block';
-                                              refreshDiv.style.position = 'absolute';
-                                              refreshDiv.onclick = function(event) {
-                                                imgB64 = img2imgDiv.getElementsByTagName('img')[0] ? img2imgDiv.getElementsByTagName('img')[0].src : '';
-                                                updateImage();
-                                              }
-                                              canvDiv.append(refreshDiv);
-                                              positionDiv = document.createElement('div');
-                                              positionDiv.innerHTML = 'pos: Fixed';
-                                              positionDiv.style.left = '0px';
-                                              positionDiv.style.top = '0px';
-                                              positionDiv.style.width = '30px';
-                                              positionDiv.style.height = '30px';
-                                              positionDiv.style.display = 'block';
-                                              positionDiv.style.position = 'absolute';
-                                              positionDiv.onclick = function(event) {
-                                                if (canvDiv.style.position==='absolute') {
-                                                  canvDiv.style.position = 'fixed';
-                                                  canvDiv.style.top = '100px';
-                                                  positionDiv.innerHTML = 'F';
-                                                } else {
-                                                  canvDiv.style.position = 'absolute';
-                                                  positionDiv.innerHTML = 'A';
-                                                }
-                                              }
-                                              canvDiv.append(positionDiv);
-                                              containerDiv = document.createElement('div');
-                                              containerDiv.style.left = '0px';
-                                              containerDiv.style.top = '30px';
-                                              containerDiv.style.right = '0px';
-                                              containerDiv.style.bottom = '0px';
-                                              containerDiv.style.display = 'block'
-                                              containerDiv.style.position = 'absolute';
-                                              containerDiv.style.overflow = 'auto';
-                                              canv = document.createElement('canvas');
-                                              canv.id = 'outDrawCanvas';
-                                              canv.style.left = '0px';
-                                              canv.style.top = '0px';
-                                              containerDiv.append(canv);
-                                              canvDiv.append(containerDiv);
-                                              tabDiv.append(canvDiv);
-                                              canvDiv.style.display = 'none';
-                                              canvDiv.style.position = 'absolute';
-                                              canvDiv.style.minWidth = '400px';
-                                              canvDiv.style.minHeight = '200px';
-                                              canvDiv.style.right = '50px';
-                                              canvDiv.style.top = '50px';
-                                              canvDiv.style.height = '500px';
-                                              canvDiv.style.zIndex = '1000';
-                                              canvDiv.style.background = '#d0d0d0';
-                                              canvDiv.style.overflow = 'hidden';
-                                              canvDiv.style.resize = 'both';
-                                              dragElement(canvDiv,'outDrawCanvasTitle');
-                                              canv.onclick = function(event) {
-                                                event.stopPropagation();
-                                                let rect = canv.getBoundingClientRect();
-                                                let x = event.clientX - rect.left;
-                                                let y = event.clientY - rect.top;
-                                                if (x>canv.width-512 || y>canv.height-512) return;
-                                                let ctx = canv.getContext('2d');
-                                                ctx.fillStyle = 'black';
-                                                ctx.fillRect(0, 0, canv.width, canv.height);
-                                                ctx.drawImage(canv.storeImage, 400, 400, canv.width-800, canv.height-800);
-                                                ctx.beginPath();
-                                                ctx.lineWidth = '2';
-                                                ctx.strokeStyle = 'white';
-                                                x = Math.floor(x);
-                                                y = Math.floor(y);
-                                                ctx.rect(x, y, 512, 512);
-                                                ctx.stroke();
-                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].value = x - 400;
-                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[1].value = x - 400;
-                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].value = y -400;
-                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[1].value = y - 400;
-                                                grap.shadowRoot.getElementById('leftCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));
-                                                grap.shadowRoot.getElementById('topCoord').getElementsByTagName('input')[0].dispatchEvent(new Event('input'));
-                                              }
-                                            }
-                                            if (canvDiv.style.display!=='none') {
-                                              canvDiv.style.display = 'none';
-                                              return 0;
-                                            }
-                                            function resetView() {
-                                              canvDiv.style.display = 'block';
-                                              canvDiv.style.position = 'fixed';
-                                              canvDiv.style.left = '400px';
-                                              canvDiv.style.width = '800px';
-                                              canvDiv.style.top = '0px';
-                                              canvDiv.style.height = '50%';
-                                              positionDiv.innerHTML = 'F';
-                                            }
-                                            function updateImage() {
-                                              let ctx = canv.getContext('2d');
-                                              let image = new Image();
-                                              image.onload = function() {
-                                                console.info('onLoad');
-                                                canv.width = this.width;
-                                                canv.height = this.height;
-                                                ctx.drawImage(this, 0, 0);
-                                                let pixelData = ctx.getImageData(0, 0, canv.width, canv.height).data;
-                                                let firstX = 9999;
-                                                let firstY = 9999;
-                                                let lastX = 0;
-                                                let lastY = 0;
-                                                for (let y=0;y<this.height;y=y+10) {
-                                                  for (let x=0;x<this.width;x++) {
-                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {
-                                                      if (x<firstX) firstX = x;
-                                                      if (x>lastX) lastX = x;
-                                                    }
-                                                  }
-                                                }
-                                                for (let x=0;x<this.width;x=x+10) {
-                                                  for (let y=0;y<this.height;y++) {
-                                                    if (pixelData[y*this.width*3+x*3] || pixelData[y*this.width*3+x*3+1] || pixelData[y*this.width*3+x*3+2]) {
-                                                      if (y<firstY) firstY = y;
-                                                      if (y>lastY) lastY = y;
-                                                    }
-                                                  }
-                                                }
-                                                if (lastX<firstX || lastY < firstY) {
-                                                  console.info('no data found in Image');
-                                                  return 0;
-                                                }
-                                                canv.width = (lastX - firstX) + 800;
-                                                canv.style.width = canv.width + 'px';
-                                                canv.height = (lastY - firstY) + 800;
-                                                canv.style.height = canv.height + 'px';
-                                                ctx.fillStyle = 'black';
-                                                ctx.fillRect(0, 0, canv.width, canv.height);
-                                                ctx.drawImage(image, 400, 400, (lastX - firstX), (lastY - firstY));
-                                                canv.storeImage = this; 
-                                              };
-                                              console.info('loading image');
-                                              image.src = imgB64;
-                                              return 0;
-                                            };
-                                            if (canv && imgB64) {
-                                              updateImage();
-                                              resetView();
-                                            } else {
-                                              console.info('failed to get Image data');
-                                            }
-                                            return 0}"""
-        canvasButton.click(None, [], dummy, _js = javaScriptFunction)
-        return [leftcoord, topcoord,canvasButton,dummy]
+        javaScriptFunction = """(x) => {
+            let alphaWindow,alphaPosition,alphaCanvas,alphaFile,alphaSideMenu,alphaItem,alphaTopMenu;
+            if (!gradioApp().getElementById('alphaWindow')) {
+                console.info('first run. create Canvas.');
+                let tabDiv = gradioApp().getElementById('tab_img2img');
+                let Outer = document.createElement('div');
+                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden;resize:both;background:#f0f0f0;border-radius:5px;border: 1px solid black;'>
+                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;display:block;position:absolute;background:#ffffff'>A</div>
+                            <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#4444cc;color:#ffffff;;padding-left: 5px;'>AlphaCanvas</div>
+                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;display:block;position:absolute;background:#ffeeee;border:1px solid black;padding-left: 5px;'>Close</div>
+                            <input id='alphaFile' style='display:none' type='file'></input>
+                            <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:64px;display:block;position:absolute;background:#eeeeff'>
+                                <img draggable='true' id='alphaItem' style='left:5px;top:0px;width:64px;height:64px;display:block;position:absolute'/>
+                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Grab Results</div>
+                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Apply Patch</div>
+                                <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
+                                <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute'>Hue:0</div>
+                                <input id='alphaSaturation' style='left:75px;top:21px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
+                                <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute'>S:0</div>
+                                <input id='alphaLightness' style='left:75px;top:42px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
+                                <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute'>L:0</div>
+                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;'>Load Canvas</div>
+                                <div id='alphaDownload' style='left:42%;top:33px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;'>saveCanvas</div>
+                            </div>
+                            <div id='alphaSideMenu' style='right:0px;top:100px;width:64px;bottom:0px;display:block;position:absolute;background:#eeeeff'></div>
+                            <div id='alphaCanvasContainer' style='left:0px;top:100px;right:80px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
+                                <canvas id='alphaCanvas' style='display:block;position:absolute;left:0px;top:0px;'></canvas>
+                            </div>
+                        </div>`;
+                Outer.innerHTML = HTML;
+                while (Outer.firstChild) {
+                     tabDiv.appendChild(Outer.firstChild);
+                }
+                // Fixed / Absolute
+                gradioApp().getElementById('alphaPosition').onclick = function(event) {
+                    if (alphaWindow.style.position==='absolute') {
+                        alphaWindow.style.position = 'fixed';
+                        alphaWindow.style.top = '100px';
+                        alphaPosition.innerHTML = 'F';
+                    } else {
+                        alphaWindow.style.position = 'absolute';
+                        alphaPosition.innerHTML = 'A';
+                    }
+                }
+                
+                // Drag
+                function dragElement(elmnt,nn) {
+                    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, pos5 = 0, pos6 = 0;
+                    if (gradioApp().getElementById(nn)) {
+                        gradioApp().getElementById(nn).onmousedown = dragMouseDown;
+                    } else {
+                        elmnt.onmousedown = dragMouseDown;
+                    }
+                    function dragMouseDown(e) {
+                        e = e || window.event;
+                        let totalOffsetX = 0; let totalOffsetY = 0;
+                        let currentElement = elmnt;
+                        do{
+                            totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+                            totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+                        }
+                        while(currentElement = currentElement.offsetParent)
+                        let mpos_x = e.pageX - totalOffsetX;
+                        let mpos_y = e.pageY - totalOffsetY;
+                        pos3 = e.clientX;
+                        pos4 = e.clientY;
+                        e.preventDefault();
+                        pos5 = elmnt.offsetTop;
+                        pos6 = elmnt.offsetLeft;
+                        document.onmouseup = closeDragElement;
+                        document.onmousemove = elementDrag;
+                        e.preventDefault();
+                    }
+                    function elementDrag(e) {
+                        e = e || window.event;
+                        e.preventDefault();
+                        pos1 = pos3 - e.clientX+5;
+                        pos2 = pos4 - e.clientY+5;
+                        if (pos5 - pos2 > 0) {
+                            elmnt.style.top = (pos5 - pos2) + 'px';
+                        }
+                        elmnt.style.left = (pos6 - pos1) + 'px';
+                    }
+                    function closeDragElement() {
+                        document.onmouseup = null;
+                        document.onmousemove = null;
+                    }
+                }
+                dragElement(gradioApp().getElementById('alphaWindow'),'alphaTitle');
+                
+                // Load File
+                function loadImage(image) {
+                    let ctx = alphaCanvas.getContext('2d');
+                    alphaCanvas.width = image.width + 800;
+                    alphaCanvas.height = image.height + 800;
+                    alphaCanvas.style.width = alphaCanvas.width + 'px';
+                    alphaCanvas.style.height = alphaCanvas.height + 'px';
+                    ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
+                    ctx.drawImage(image, 400, 400);
+                    alphaCanvas.storeImage = image;                 
+                }
+                gradioApp().getElementById('alphaFile').onchange = function(e) {
+                    let reader = new FileReader();
+                    reader.onload = function(event){
+                        let image = new Image();
+                        image.onload = function() {
+                            loadImage(this); 
+                        };
+                        console.info('loading image');
+                        image.src = event.target.result;
+                    }
+                    console.info(this.files);
+                    reader.readAsDataURL(this.files[0]);
+                }
+                gradioApp().getElementById('alphaUpload').onclick = function(e) {
+                    alphaFile.click();
+                }
+                
+                // Save Image
+                gradioApp().getElementById('alphaDownload').onclick = function(e) {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = alphaCanvas.width-800;
+                    tempCanvas.height = alphaCanvas.height-800;
+                    let ctx2 = tempCanvas.getContext('2d');
+                    ctx2.drawImage(alphaCanvas.storeImage, 0, 0);
+                    const link = document.createElement('a');
+                    link.download = 'canvas.png';
+                    link.href = tempCanvas.toDataURL();
+                    link.click();
+                    link.delete;
+                };
+                
+                // Color Shifted Patch
+                function getColorShiftedPatch() {
+                    const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
+                    const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
+                    const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
+                    
+                    // HSL Functions from: https://gist.github.com/mjackson/5311256
+                    function rgbToHsl(r, g, b) {
+                      r /= 255, g /= 255, b /= 255;
+                      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+                      var h, s, l = (max + min) / 2;
+                      if (max == min) {
+                        h = s = 0; // achromatic
+                      } else {
+                        var d = max - min;
+                        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                        switch (max) {
+                          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                          case g: h = (b - r) / d + 2; break;
+                          case b: h = (r - g) / d + 4; break;
+                        }
+                        h /= 6;
+                      }
+                      return [ h, s, l ];
+                    }
+                    function hslToRgb(h, s, l) {
+                      var r, g, b;
+                      if (s == 0) {
+                        r = g = b = l; // achromatic
+                      } else {
+                        function hue2rgb(p, q, t) {
+                          if (t < 0) t += 1;
+                          if (t > 1) t -= 1;
+                          if (t < 1/6) return p + (q - p) * 6 * t;
+                          if (t < 1/2) return q;
+                          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                          return p;
+                        }
+                        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                        var p = 2 * l - q;
+                        r = hue2rgb(p, q, h + 1/3);
+                        g = hue2rgb(p, q, h);
+                        b = hue2rgb(p, q, h - 1/3);
+                      }
+                      return [ r * 255, g * 255, b * 255 ];
+                    }
+                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                        const tempCanvasOrig = document.createElement('canvas');
+                        tempCanvasOrig.width = alphaCanvas.patched.width;
+                        tempCanvasOrig.height = alphaCanvas.patched.height;
+                        let ctx1 = tempCanvasOrig.getContext('2d');
+                        const tempCanvasNew = document.createElement('canvas');
+                        tempCanvasNew.width = alphaCanvas.patched.width;
+                        tempCanvasNew.height = alphaCanvas.patched.height;
+                        let ctx2 = tempCanvasNew.getContext('2d');
+                        ctx1.drawImage(alphaCanvas.storeImage,alphaCanvas.patchedX-400,alphaCanvas.patchedY-400,512,512,0,0,512,512);
+                        ctx2.drawImage(alphaCanvas.patched, 0, 0);
+                        let pixelData1 = ctx1.getImageData(0, 0, tempCanvasOrig.width, tempCanvasOrig.height).data;
+                        let pixel2 = ctx2.getImageData(0, 0, tempCanvasNew.width, tempCanvasNew.height);
+                        let pixelData2 = pixel2.data;
+                        for (let y=0;y<tempCanvasOrig.height;y++) {
+                          for (let x=0;x<tempCanvasOrig.width;x++) {
+                            const index = y*tempCanvasOrig.width*4+x*4;
+                            if (pixelData1[index]!==pixelData2[index] || pixelData1[index+1]!==pixelData2[index+1] || pixelData1[index+2]!==pixelData2[index+2]) {
+                              /*
+                              pixelData2[index] = Math.abs(pixelData2[index] - pixelData1[index]);
+                              pixelData2[index+1] = Math.abs(pixelData2[index+1] - pixelData1[index+1]);
+                              pixelData2[index+2] = Math.abs(pixelData2[index+2] - pixelData1[index+2]);
+                              */
+                              const hsl = rgbToHsl(pixelData2[index],pixelData2[index+1],pixelData2[index+2]);
+                              hsl[0] += colorShift;
+                              hsl[1] += saturationShift;
+                              hsl[2] += lightnessShift;
+                              if (hsl[0]<0) { hsl[0]+=1;}
+                              if (hsl[0]>1) { hsl[0]-=1;}
+                              if (hsl[1]<0) { hsl[1]=0;}
+                              if (hsl[1]>1) { hsl[1]=1;}
+                              if (hsl[2]<0) { hsl[2]=0;}
+                              if (hsl[2]>1) { hsl[2]=1;}
+                              let rgb = hslToRgb(hsl[0],hsl[1],hsl[2]);
+                              pixelData2[index] = rgb[0];
+                              pixelData2[index+1] = rgb[1];
+                              pixelData2[index+2] = rgb[2];
+                            }
+                          }
+                        }
+                        ctx2.putImageData(pixel2, 0, 0);
+                        return tempCanvasNew;
+                    }
+                }
+                gradioApp().getElementById('alphaHue').onchange = function(e) {
+                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                        const shiftedImage = getColorShiftedPatch()
+                        let ctx = alphaCanvas.getContext('2d');
+                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + gradioApp().getElementById('alphaHue').value;
+                    }
+                }
+                gradioApp().getElementById('alphaSaturation').onchange = function(e) {
+                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                        const shiftedImage = getColorShiftedPatch()
+                        let ctx = alphaCanvas.getContext('2d');
+                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + gradioApp().getElementById('alphaSaturation').value;
+                    }
+                }
+                gradioApp().getElementById('alphaLightness').onchange = function(e) {
+                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                        const shiftedImage = getColorShiftedPatch()
+                        let ctx = alphaCanvas.getContext('2d');
+                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + gradioApp().getElementById('alphaLightness').value;
+                    }
+                }
+                
+                gradioApp().getElementById('alphaMerge').onclick = function(e) {
+                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                        let leftShift = 0;
+                        let topShift = 0;
+                        let xMove = alphaCanvas.patchedX - 400;
+                        let yMove = alphaCanvas.patchedY - 400;
+                        let newwidth = alphaCanvas.storeImage.width;
+                        let newheight = alphaCanvas.storeImage.height;
+                        if (alphaCanvas.patchedX < 400) {
+                            newwidth = newwidth + (400 - alphaCanvas.patchedX);
+                            leftShift = (400 - alphaCanvas.patchedX);
+                            xMove = 0;
+                        }
+                        if (alphaCanvas.patchedY < 400) {
+                            newheight = newheight + (400 - alphaCanvas.patchedY);
+                            topShift = (400 - alphaCanvas.patchedY);
+                            yMove = 0;
+                        }
+                        if (alphaCanvas.patchedX + 112 >newwidth) newwidth = alphaCanvas.patchedX + 112;
+                        if (alphaCanvas.patchedY + 112 >newheight) newheight = alphaCanvas.patchedY + 112;
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = newwidth;
+                        tempCanvas.height = newheight;
+                        let ctx2 = tempCanvas.getContext('2d');
+                        ctx2.drawImage(alphaCanvas.storeImage, leftShift, topShift);
+                        const shiftedImage = getColorShiftedPatch();
+                        ctx2.drawImage(shiftedImage, xMove, yMove);
+                        loadImage(tempCanvas);
+                    }
+                };
+                
+                
+                function importRegion(image) {
+                    let ctx = alphaCanvas.getContext('2d');
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = 512;
+                    tempCanvas.height = 512;
+                    let ctx2 = tempCanvas.getContext('2d');
+                    ctx2.drawImage(image, 0,0);
+                    alphaCanvas.patched = tempCanvas;
+                    alphaCanvas.patchedX = alphaCanvas.markedX;
+                    alphaCanvas.patchedY = alphaCanvas.markedY;
+                }
+                
+                // Import results
+                function getImages() {
+                    let imgParent = gradioApp().getElementById('img2img_gallery');
+                    if  (get_tab_index('mode_img2img')===1) {
+                        imgParent = gradioApp().getElementById('img2img_gallery');
+                    }
+                    const choices = imgParent.getElementsByClassName('gallery-item group');
+                    let nr = 0;
+                    alphaSideMenu.innerHTML = '';
+                    for (choice in choices) {
+                        if (choices[choice].children && choices[choice].children[0]) {
+                            let image2 = new Image();
+                            image2.style.right = '20px';
+                            image2.style.top = (nr*70)+'px';
+                            image2.style.width = '64px';
+                            image2.style.height = '64px';
+                            image2.style.display = 'block';
+                            image2.style.position = 'absolute';
+                            image2.style.zIndex = '1';
+                            alphaSideMenu.append(image2);
+                            image2.onload = function() {};     
+                            image2.onclick = function(e) {
+                                importRegion(this);
+                                let ctx = alphaCanvas.getContext('2d');
+                                const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
+                                const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
+                                const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
+                                if (Math.abs(lightnessShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
+                                  const shiftedImage = getColorShiftedPatch()
+                                  ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
+                                } else {
+                                  ctx.drawImage(alphaCanvas.patched, alphaCanvas.markedX, alphaCanvas.markedY);
+                                }
+                            }                            
+                            image2.src = choices[choice].children[0].src;
+                            nr++;
+                            console.info('image:',nr);
+                        }
+                    }
+                }
+                gradioApp().getElementById('alphaGrab').onclick = function(e) {
+                    getImages();
+                }
 
-    def run(self, p, leftcoord, topcoord,canvasButton,dummy):
-        leftcoord = int(leftcoord)
-        topcoord = int(topcoord)
+                // Select Working Region
+                gradioApp().getElementById('alphaCanvas').onclick = function(event) {
+                    event.stopPropagation();
+                    let rect = alphaCanvas.getBoundingClientRect();
+                    let x = Math.floor(event.clientX - rect.left);
+                    let y = Math.floor(event.clientY - rect.top);
+                    if (x > alphaCanvas.width - 512 || y > alphaCanvas.height - 512) return;
+                    let ctx = alphaCanvas.getContext('2d');
+                    ctx.fillStyle = 'rgba(0,0,0,255)'
+                    //ctx.fillRect(0, 0, alphaCanvas.width, alphaCanvas.height);
+                    ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
+                    ctx.drawImage(alphaCanvas.storeImage, 400, 400, alphaCanvas.width-800, alphaCanvas.height-800);
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = 512;
+                    tempCanvas.height = 512;
+                    let ctx2 = tempCanvas.getContext('2d');
+                    ctx2.fillStyle = 'rgb(0,0,0)'
+                    ctx2.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    ctx2.drawImage(alphaCanvas.storeImage, x-400, y-400, 512, 512,0,0,512,512);
+                    alphaItem.src = tempCanvas.toDataURL('image/png');
+                    ctx.beginPath();
+                    ctx.lineWidth = '1';
+                    ctx.strokeStyle = 'white';
+                    ctx.rect(x, y, 512, 512);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.lineWidth = '1';
+                    ctx.strokeStyle = 'black';
+                    ctx.rect(x-1, y-1, 514, 514);
+                    ctx.stroke();
+                    alphaCanvas.lastX = x;
+                    alphaCanvas.lastY = y;
+                }
+
+                gradioApp().getElementById('alphaClose').onclick = function(e) {
+                    alphaWindow.style.display = 'none';
+                }                
+                gradioApp().getElementById('alphaItem').ondragend= function(e) {
+                    console.info('dropped');
+                    alphaCanvas.markedX = alphaCanvas.lastX
+                    alphaCanvas.markedY = alphaCanvas.lastY
+                }                
+            }
+            alphaWindow = gradioApp().getElementById('alphaWindow');
+            alphaPosition = gradioApp().getElementById('alphaPosition');
+            alphaCanvas = gradioApp().getElementById('alphaCanvas');
+            alphaFile = gradioApp().getElementById('alphaFile');
+            alphaSideMenu = gradioApp().getElementById('alphaSideMenu');
+            alphaTopMenu = gradioApp().getElementById('alphaTopMenu');
+            alphaItem = gradioApp().getElementById('alphaItem');
+            
+            if (alphaWindow.style.display!=='none') {
+                alphaWindow.style.display = 'none';
+                return 0;
+            }
+
+            function resetView() {
+                alphaWindow.style.display = 'block';
+                alphaWindow.style.position = 'fixed';
+                alphaWindow.style.left = '400px';
+                alphaWindow.style.width = '800px';
+                alphaWindow.style.top = '0px';
+                alphaWindow.style.height = '50%';
+                alphaPosition.innerHTML = 'F';
+            }
+            if (alphaCanvas) {
+                resetView();
+            } else {
+                console.info('failed to get Image data');
+            }
+        return 0}"""
+
+        canvasButton.click(None, [], dummy, _js = javaScriptFunction)
+        return [canvasButton,dummy]
+
+    def run(self, p, canvasButton, dummy):
         p.mask_blur = 0
         p.inpaint_full_res = False
         p.do_not_save_samples = True
         p.do_not_save_grid = True
-        origInBaseLeft = 0
-        origInBaseTop = 0
-        workItemLeft = leftcoord
-        workItemTop = topcoord
-        newwidth = p.init_images[0].width
-        newheight = p.init_images[0].height
-        if leftcoord<0: 
-          newwidth = newwidth - leftcoord
-          origInBaseLeft = -leftcoord
-          workItemLeft = 0          
-        if topcoord<0:
-          newheight = newheight - topcoord
-          origInBaseTop = -topcoord
-          workItemTop = 0
-        if leftcoord + p.width > newwidth:
-          newwidth = leftcoord + p.width
-        if topcoord + p.height > newheight:
-          newheight = topcoord + p.height
-        newBase = Image.new("RGB", (newwidth, newheight), "black")
-        newBase.paste(p.init_images[0], (origInBaseLeft, origInBaseTop))
-        workItem = Image.new("RGB", (p.width, p.height))
-        region = newBase.crop((workItemLeft, workItemTop, workItemLeft+p.width, workItemTop + p.height))
-        workItem.paste(region, (0,0))
+        newBase = Image.new("RGB", (p.width, p.height), "black")
+        newBase.paste(p.init_images[0], (0,0))
+        workItem = newBase.copy()
         workData = np.array(workItem).astype(np.float32) / 255.0
         mask = Image.new("L", (p.width, p.height),color=255)
         maskData = np.array(mask)
@@ -412,6 +569,6 @@ class Script(scripts.Script):
         for n in range(p.batch_size):
           proc_img = proc.images[n]
           final_image = newBase.copy()
-          final_image.paste(proc_img,(workItemLeft,workItemTop))
+          final_image.paste(proc_img,(0,0))
           proc.images[n] = final_image
         return proc
