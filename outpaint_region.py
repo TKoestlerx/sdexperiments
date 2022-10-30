@@ -237,10 +237,8 @@ class Script(scripts.Script):
                         image.onload = function() {
                             loadImage(this); 
                         };
-                        console.info('loading image');
                         image.src = event.target.result;
                     }
-                    console.info(this.files);
                     reader.readAsDataURL(this.files[0]);
                 }
                 gradioApp().getElementById('alphaUpload').onclick = function(e) {
@@ -447,7 +445,7 @@ class Script(scripts.Script):
                                 const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
                                 const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
                                 const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
-                                if (Math.abs(lightnessShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
+                                if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
                                   const shiftedImage = getColorShiftedPatch()
                                   ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
                                 } else {
@@ -456,7 +454,6 @@ class Script(scripts.Script):
                             }                            
                             image2.src = choices[choice].children[0].src;
                             nr++;
-                            console.info('image:',nr);
                         }
                     }
                 }
