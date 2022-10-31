@@ -141,7 +141,7 @@ class Script(scripts.Script):
                             <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;display:block;position:absolute;background:#ffeeee;border:1px solid black;padding-left: 5px;'>Close</div>
                             <input id='alphaFile' style='display:none' type='file'></input>
                             <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:64px;display:block;position:absolute;background:#eeeeff'>
-                                <img draggable='true' id='alphaItem' style='left:5px;top:0px;width:64px;height:64px;display:block;position:absolute'/>
+                                <img id='alphaItem' style='left:5px;top:0px;width:64px;height:64px;display:block;position:absolute'/>
                                 <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Grab Results</div>
                                 <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Apply Patch</div>
                                 <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
@@ -497,12 +497,32 @@ class Script(scripts.Script):
 
                 gradioApp().getElementById('alphaClose').onclick = function(e) {
                     alphaWindow.style.display = 'none';
-                }                
-                gradioApp().getElementById('alphaItem').ondragend= function(e) {
-                    console.info('dropped');
-                    alphaCanvas.markedX = alphaCanvas.lastX
-                    alphaCanvas.markedY = alphaCanvas.lastY
-                }                
+                }
+                gradioApp().getElementById('alphaItem').onclick= function(e) {
+                    const dt= new DataTransfer()
+                    let fileString = gradioApp().getElementById('alphaItem').src;
+                    fetch(fileString).then(
+                        function ok(o) {
+                            o.blob().then(
+                                function ok2(o2) {
+                                    let file = new File([o2], "transfer.png", { type: 'image/png'})
+                                    dt.items.add(file);
+                                    let imgParent = gradioApp().getElementById('img2img_image');
+                                    if  (get_tab_index('mode_img2img')===1) {
+                                        imgParent = gradioApp().getElementById('img2maskimg');
+                                    }
+                                    const fileInput = imgParent.querySelector('input[type="file"]');
+                                    fileInput.files = dt.files;
+                                    fileInput.dispatchEvent(new Event('change'));
+                                },
+                                function failed2(e2) {
+                                });
+                        },
+                        function failed(e) {
+                        });
+                    alphaCanvas.markedX = alphaCanvas.lastX;
+                    alphaCanvas.markedY = alphaCanvas.lastY;
+                }
             }
             alphaWindow = gradioApp().getElementById('alphaWindow');
             alphaPosition = gradioApp().getElementById('alphaPosition');
