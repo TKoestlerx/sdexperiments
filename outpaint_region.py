@@ -465,8 +465,9 @@ class Script(scripts.Script):
                 gradioApp().getElementById('alphaCanvas').onclick = function(event) {
                     event.stopPropagation();
                     let rect = alphaCanvas.getBoundingClientRect();
-                    let x = Math.floor(event.clientX - rect.left);
-                    let y = Math.floor(event.clientY - rect.top);
+                    let x = Math.floor(event.clientX - rect.left) - 256;
+                    let y = Math.floor(event.clientY - rect.top) - 256;
+                    if (x < 0 || y<0) return;
                     if (x > alphaCanvas.width - 512 || y > alphaCanvas.height - 512) return;
                     let ctx = alphaCanvas.getContext('2d');
                     ctx.fillStyle = 'rgba(0,0,0,255)'
@@ -494,6 +495,35 @@ class Script(scripts.Script):
                     alphaCanvas.lastX = x;
                     alphaCanvas.lastY = y;
                 }
+                // full window on right click
+                gradioApp().getElementById('alphaCanvas').addEventListener('contextmenu', function(ev) {
+                    ev.preventDefault();
+                    if (alphaWindow.fullS) {
+                        alphaWindow.style.position = alphaWindow.oldPos;
+                        alphaWindow.style.left = alphaWindow.oldPosLeft;
+                        alphaWindow.style.width = alphaWindow.oldWidth;
+                        alphaWindow.style.top = alphaWindow.oldPosTop;
+                        alphaWindow.style.height = alphaWindow.oldHeight;
+                        alphaPosition.innerHTML = alphaWindow.oldPosString;
+                        alphaPosition.style.display = 'block';
+                        alphaWindow.fullS = false;
+                    } else {
+                        alphaWindow.oldPos = alphaWindow.style.position;
+                        alphaWindow.oldPosLeft = alphaWindow.style.left;
+                        alphaWindow.oldWidth = alphaWindow.style.width;
+                        alphaWindow.oldPosTop = alphaWindow.style.top;
+                        alphaWindow.oldHeight = alphaWindow.style.height;
+                        alphaWindow.oldPosString = alphaPosition.innerHTML;
+                        alphaPosition.style.display = 'none';
+                        alphaWindow.fullS = true;
+                        alphaWindow.style.position = 'fixed';
+                        alphaWindow.style.left = '0px';
+                        alphaWindow.style.width = '100%';
+                        alphaWindow.style.top = '0px';
+                        alphaWindow.style.height = '100%';
+                    }
+                    return false;
+                }, false);
 
                 gradioApp().getElementById('alphaClose').onclick = function(e) {
                     alphaWindow.style.display = 'none';
@@ -545,6 +575,7 @@ class Script(scripts.Script):
                 alphaWindow.style.top = '0px';
                 alphaWindow.style.height = '50%';
                 alphaPosition.innerHTML = 'F';
+                alphaWindow.fullS = false;
             }
             if (alphaCanvas) {
                 resetView();
