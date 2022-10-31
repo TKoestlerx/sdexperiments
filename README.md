@@ -11,6 +11,9 @@ Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable
 - images containing the perfect "black" (0,0,0) will be problematic. (because it wants to draw over it) inpainting will be fine though.
 - "rough" ui. (canvas is created in gradio event handler)
 
+
+Update: Clicking the thumbnail Image should now transfer it to the gradio Interface. Drag and Drop was broken on Firefox.
+
 Workflow:  
 =========
 The idea is to take the amount of data out of the gradio interface when outpainting or inpainting larger images. You select on the canvas only the region you want to edit or generate. Then you "drag" this region into the respective interface (img2img or img2img inpaint). When the calculation is done, you get the results and insert them seamlessly (with color correction) into the big image.
