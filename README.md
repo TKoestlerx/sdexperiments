@@ -12,7 +12,13 @@ Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable
 - "rough" ui. (canvas is created in gradio event handler)
 
 
-Update: Clicking the thumbnail Image should now transfer it to the gradio Interface. Drag and Drop was broken on Firefox.
+Update: 
+Clicking the thumbnail Image should now transfer it to the gradio Interface. Drag and Drop was broken on Firefox.
+
+Update II:
+Leftclick on canvas will now define the center of the new region.
+
+Rightclick on canvas will toggle between fullscreen and windowed.
 
 Workflow:  
 =========
