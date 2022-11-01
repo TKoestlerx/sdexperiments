@@ -438,8 +438,10 @@ class Script(scripts.Script):
                     const choices = imgParent.getElementsByClassName('gallery-item group');
                     let nr = 0;
                     alphaSideMenu.innerHTML = '';
+                    console.info('reading results... checking ' + choices.length + ' elements.');
                     for (choice in choices) {
                         if (choices[choice].children && choices[choice].children[0]) {
+                            console.info('creating new img Element');
                             let image2 = new Image();
                             image2.style.right = '20px';
                             image2.style.top = (nr*70)+'px';
@@ -449,7 +451,9 @@ class Script(scripts.Script):
                             image2.style.position = 'absolute';
                             image2.style.zIndex = '1';
                             alphaSideMenu.append(image2);
-                            image2.onload = function() {};     
+                            image2.onload = function() {
+                                console.info('result image load complete.');
+                            };
                             image2.onclick = function(e) {
                                 if (alphaCanvas.markedX) {
                                     importRegion(this);
@@ -458,11 +462,12 @@ class Script(scripts.Script):
                                     console.info('dont know where to put this region.');
                                 }
                             }
-                            image2.src = convertToDataUrl(choices[choice].children[0]);
-                            //image2.src = choices[choice].children[0].src;
+                            //image2.src = convertToDataUrl(choices[choice].children[0]);
+                            image2.src = choices[choice].children[0].src;
                             nr++;
                         }
                     }
+                    console.info('importing results complete. ' + nr + ' images');
                 }
                 gradioApp().getElementById('alphaGrab').onclick = function(e) {
                     getImages();
