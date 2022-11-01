@@ -136,22 +136,22 @@ class Script(scripts.Script):
                 let tabDiv = gradioApp().getElementById('tab_img2img');
                 let Outer = document.createElement('div');
                 HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden;resize:both;background:#f0f0f0;border-radius:5px;border: 1px solid black;'>
-                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;display:block;position:absolute;background:#ffffff'>A</div>
-                            <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#4444cc;color:#ffffff;;padding-left: 5px;'>AlphaCanvas</div>
-                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;display:block;position:absolute;background:#ffeeee;border:1px solid black;padding-left: 5px;'>Close</div>
+                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;display:block;position:absolute;background:#ffffff;color:#000000'>A</div>
+                            <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#4444cc;color:#ffffff;padding-left: 5px;'>AlphaCanvas</div>
+                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;display:block;position:absolute;background:#ffeeee;color:#000000;border:1px solid black;padding-left: 5px;'>Close</div>
                             <input id='alphaFile' style='display:none' type='file'></input>
                             <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:64px;display:block;position:absolute;background:#eeeeff'>
                                 <img id='alphaItem' style='left:5px;top:0px;width:64px;height:64px;display:block;position:absolute'/>
-                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Grab Results</div>
-                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden'>Apply Patch</div>
+                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden;color:#000000'>Grab Results</div>
+                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden;color:#000000'>Apply Patch</div>
                                 <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute'>Hue:0</div>
+                                <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute;color:#000000'>Hue:0</div>
                                 <input id='alphaSaturation' style='left:75px;top:21px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute'>S:0</div>
+                                <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute;color:#000000'>S:0</div>
                                 <input id='alphaLightness' style='left:75px;top:42px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute'>L:0</div>
-                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;'>Load Canvas</div>
-                                <div id='alphaDownload' style='left:42%;top:33px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;'>saveCanvas</div>
+                                <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute;color:#000000'>L:0</div>
+                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;color:#000000'>Load Canvas</div>
+                                <div id='alphaDownload' style='left:42%;top:33px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;color:#000000'>Save Canvas</div>
                             </div>
                             <div id='alphaSideMenu' style='right:0px;top:100px;width:64px;bottom:0px;display:block;position:absolute;background:#eeeeff'></div>
                             <div id='alphaCanvasContainer' style='left:0px;top:100px;right:80px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
@@ -162,6 +162,7 @@ class Script(scripts.Script):
                 while (Outer.firstChild) {
                      tabDiv.appendChild(Outer.firstChild);
                 }
+
                 // Fixed / Absolute
                 gradioApp().getElementById('alphaPosition').onclick = function(event) {
                     if (alphaWindow.style.position==='absolute') {
@@ -173,7 +174,7 @@ class Script(scripts.Script):
                         alphaPosition.innerHTML = 'A';
                     }
                 }
-                
+
                 // Drag
                 function dragElement(elmnt,nn) {
                     let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0, pos5 = 0, pos6 = 0;
@@ -218,7 +219,7 @@ class Script(scripts.Script):
                     }
                 }
                 dragElement(gradioApp().getElementById('alphaWindow'),'alphaTitle');
-                
+
                 // Load File
                 function loadImage(image) {
                     let ctx = alphaCanvas.getContext('2d');
@@ -226,6 +227,12 @@ class Script(scripts.Script):
                     alphaCanvas.height = image.height + 800;
                     alphaCanvas.style.width = alphaCanvas.width + 'px';
                     alphaCanvas.style.height = alphaCanvas.height + 'px';
+                    alphaCanvas.lastX = '';
+                    alphaCanvas.lastY = '';
+                    alphaCanvas.markedX = '';
+                    alphaCanvas.markedY = '';
+                    alphaCanvas.patched = '';
+                    alphaSideMenu.innerHTML = '';
                     ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
                     ctx.drawImage(image, 400, 400);
                     alphaCanvas.storeImage = image;                 
@@ -351,25 +358,19 @@ class Script(scripts.Script):
                 }
                 gradioApp().getElementById('alphaHue').onchange = function(e) {
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
-                        const shiftedImage = getColorShiftedPatch()
-                        let ctx = alphaCanvas.getContext('2d');
-                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        redrawCanvas();
                         gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + gradioApp().getElementById('alphaHue').value;
                     }
                 }
                 gradioApp().getElementById('alphaSaturation').onchange = function(e) {
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
-                        const shiftedImage = getColorShiftedPatch()
-                        let ctx = alphaCanvas.getContext('2d');
-                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        redrawCanvas();
                         gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + gradioApp().getElementById('alphaSaturation').value;
                     }
                 }
                 gradioApp().getElementById('alphaLightness').onchange = function(e) {
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
-                        const shiftedImage = getColorShiftedPatch()
-                        let ctx = alphaCanvas.getContext('2d');
-                        ctx.drawImage(shiftedImage, alphaCanvas.patchedX, alphaCanvas.patchedY);
+                        redrawCanvas();
                         gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + gradioApp().getElementById('alphaLightness').value;
                     }
                 }
@@ -401,6 +402,10 @@ class Script(scripts.Script):
                         ctx2.drawImage(alphaCanvas.storeImage, leftShift, topShift);
                         const shiftedImage = getColorShiftedPatch();
                         ctx2.drawImage(shiftedImage, xMove, yMove);
+                        alphaCanvas.patched = ''
+                        alphaCanvas.markedX = ''
+                        alphaCanvas.markedY = ''
+                        alphaSideMenu.innerHTML = ''
                         loadImage(tempCanvas);
                     }
                 };
@@ -421,9 +426,6 @@ class Script(scripts.Script):
                 // Import results
                 function getImages() {
                     let imgParent = gradioApp().getElementById('img2img_gallery');
-                    if  (get_tab_index('mode_img2img')===1) {
-                        imgParent = gradioApp().getElementById('img2img_gallery');
-                    }
                     const choices = imgParent.getElementsByClassName('gallery-item group');
                     let nr = 0;
                     alphaSideMenu.innerHTML = '';
@@ -440,16 +442,11 @@ class Script(scripts.Script):
                             alphaSideMenu.append(image2);
                             image2.onload = function() {};     
                             image2.onclick = function(e) {
-                                importRegion(this);
-                                let ctx = alphaCanvas.getContext('2d');
-                                const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
-                                const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
-                                const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
-                                if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
-                                  const shiftedImage = getColorShiftedPatch()
-                                  ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
+                                if (alphaCanvas.markedX) {
+                                    importRegion(this);
+                                    redrawCanvas();
                                 } else {
-                                  ctx.drawImage(alphaCanvas.patched, alphaCanvas.markedX, alphaCanvas.markedY);
+                                    console.info('dont know where to put this region.');
                                 }
                             }                            
                             image2.src = choices[choice].children[0].src;
@@ -461,6 +458,43 @@ class Script(scripts.Script):
                     getImages();
                 }
 
+                function redrawCanvas() {
+                    let ctx = alphaCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
+                    ctx.drawImage(alphaCanvas.storeImage, 400, 400, alphaCanvas.width-800, alphaCanvas.height-800);
+                    if (alphaCanvas.patched) {
+                        const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
+                        const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
+                        const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
+                        if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
+                          const shiftedImage = getColorShiftedPatch()
+                          ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
+                        } else {
+                          ctx.drawImage(alphaCanvas.patched, alphaCanvas.markedX, alphaCanvas.markedY);
+                        }
+                    }
+                    // current marker
+                    if (alphaCanvas.lastX) {
+                        ctx.beginPath();
+                        ctx.lineWidth = '1';
+                        ctx.strokeStyle = 'white';
+                        ctx.rect(alphaCanvas.lastX, alphaCanvas.lastY, 512, 512);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.lineWidth = '1';
+                        ctx.strokeStyle = 'black';
+                        ctx.rect(alphaCanvas.lastX-1, alphaCanvas.lastY-1, 514, 514);
+                        ctx.stroke();
+                    }
+                    // drop marker
+                    if (alphaCanvas.markedX) {
+                        ctx.beginPath();
+                        ctx.lineWidth = '1';
+                        ctx.strokeStyle = 'red';
+                        ctx.rect(alphaCanvas.markedX, alphaCanvas.markedY, 512, 512);
+                        ctx.stroke();
+                    }  
+                }
                 // Select Working Region
                 gradioApp().getElementById('alphaCanvas').onclick = function(event) {
                     event.stopPropagation();
@@ -468,12 +502,7 @@ class Script(scripts.Script):
                     let x = Math.floor(event.clientX - rect.left) - 256;
                     let y = Math.floor(event.clientY - rect.top) - 256;
                     if (x < 0 || y<0) return;
-                    if (x > alphaCanvas.width - 512 || y > alphaCanvas.height - 512) return;
-                    let ctx = alphaCanvas.getContext('2d');
-                    ctx.fillStyle = 'rgba(0,0,0,255)'
-                    //ctx.fillRect(0, 0, alphaCanvas.width, alphaCanvas.height);
-                    ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
-                    ctx.drawImage(alphaCanvas.storeImage, 400, 400, alphaCanvas.width-800, alphaCanvas.height-800);
+                    if (x > alphaCanvas.width - 512 || y > alphaCanvas.height - 512) return;           
                     const tempCanvas = document.createElement('canvas');
                     tempCanvas.width = 512;
                     tempCanvas.height = 512;
@@ -482,22 +511,15 @@ class Script(scripts.Script):
                     ctx2.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                     ctx2.drawImage(alphaCanvas.storeImage, x-400, y-400, 512, 512,0,0,512,512);
                     alphaItem.src = tempCanvas.toDataURL('image/png');
-                    ctx.beginPath();
-                    ctx.lineWidth = '1';
-                    ctx.strokeStyle = 'white';
-                    ctx.rect(x, y, 512, 512);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.lineWidth = '1';
-                    ctx.strokeStyle = 'black';
-                    ctx.rect(x-1, y-1, 514, 514);
-                    ctx.stroke();
                     alphaCanvas.lastX = x;
                     alphaCanvas.lastY = y;
+                    redrawCanvas();
                 }
+
                 // full window on right click
-                gradioApp().getElementById('alphaCanvas').addEventListener('contextmenu', function(ev) {
-                    ev.preventDefault();
+                function toggleFullScreen(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     if (alphaWindow.fullS) {
                         alphaWindow.style.position = alphaWindow.oldPos;
                         alphaWindow.style.left = alphaWindow.oldPosLeft;
@@ -523,7 +545,9 @@ class Script(scripts.Script):
                         alphaWindow.style.height = '100%';
                     }
                     return false;
-                }, false);
+                }                
+                gradioApp().getElementById('alphaCanvas').addEventListener('contextmenu', toggleFullScreen, false);
+                gradioApp().getElementById('alphaCanvasContainer').addEventListener('contextmenu', toggleFullScreen, false);
 
                 gradioApp().getElementById('alphaClose').onclick = function(e) {
                     alphaWindow.style.display = 'none';
@@ -552,6 +576,11 @@ class Script(scripts.Script):
                         });
                     alphaCanvas.markedX = alphaCanvas.lastX;
                     alphaCanvas.markedY = alphaCanvas.lastY;
+                    alphaCanvas.lastX = '';
+                    alphaCanvas.lastY = '';
+                    alphaCanvas.patched = '';
+                    alphaSideMenu.innerHTML = '';
+                    redrawCanvas();
                 }
             }
             alphaWindow = gradioApp().getElementById('alphaWindow');
