@@ -423,6 +423,15 @@ class Script(scripts.Script):
                     alphaCanvas.patchedY = alphaCanvas.markedY;
                 }
                 
+                function convertToDataUrl(image) {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = 512;
+                    tempCanvas.height = 512;
+                    let ctx2 = tempCanvas.getContext('2d');
+                    ctx2.drawImage(image, 0,0);
+                    return tempCanvas.toDataURL('image/png');
+                }
+
                 // Import results
                 function getImages() {
                     let imgParent = gradioApp().getElementById('img2img_gallery');
@@ -448,8 +457,9 @@ class Script(scripts.Script):
                                 } else {
                                     console.info('dont know where to put this region.');
                                 }
-                            }                            
-                            image2.src = choices[choice].children[0].src;
+                            }
+                            image2.src = convertToDataUrl(choices[choice].children[0]);
+                            //image2.src = choices[choice].children[0].src;
                             nr++;
                         }
                     }
