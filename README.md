@@ -20,6 +20,10 @@ Leftclick on canvas will now define the center of the new region.
 
 Rightclick on canvas will toggle between fullscreen and windowed.
 
+Update III:
+Active Region (for copy back) will be marked with a red rectangle.
+
+
 Workflow:  
 =========
 The idea is to take the amount of data out of the gradio interface when outpainting or inpainting larger images. You select on the canvas only the region you want to edit or generate. Then you "drag" this region into the respective interface (img2img or img2img inpaint). When the calculation is done, you get the results and insert them seamlessly (with color correction) into the big image.
