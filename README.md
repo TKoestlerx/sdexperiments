@@ -9,28 +9,11 @@ Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable
 - currently hardcoded to 512x512
 - "rough" ui. (canvas is created in gradio event handler)
 
-
-Update: 
-Clicking the thumbnail Image should now transfer it to the gradio Interface. Drag and Drop was broken on Firefox.
-
-Update II:
-Leftclick on canvas will now define the center of the new region.
-
-Rightclick on canvas will toggle between fullscreen and windowed.
-
-Update III:
-Active Region (for copy back) will be marked with a red rectangle.
-
-Update IV:
-The script should no longer mess things up when left active in the inpainting Tab.
-
-If you are in the inpainting Tab and the region contains borders, an additional (alpha-) Mask will be generated and uploaded. Blur ist set to 0 (Because its never a good idea to blend with black and expect something useful). Fill mode should be set to noise and denoising to 1.0.
-
 Workflow:  
 =========
 The idea is to take the amount of data out of the gradio interface when outpainting or inpainting larger images. You select on the canvas only the region you want to edit or generate. Then you "drag" this region into the respective interface (img2img or img2img inpaint). When the calculation is done, you get the results and insert them seamlessly (with color correction) into the big image.
 
-UI:  OutPainting.
+UI:  OutPainting
 ======
 Select the "Alpha Canvas" Script in the img2img Tab:
 
@@ -44,46 +27,44 @@ Grabbing the Title Bar will allow you to place it where you want it to be.
 In the lower right corner you can extend or shrink the window.
 In the upper Left Corner you can switch between Absolute and Fixed positioning. Fixed is the default and will make the window stay where it is (in Screen space)
 If you change it to "A" or Absolute you can place it somewhere on the Page, and it will stay there, scrolling with the page. So you can for Example put it in this neat space of nothingness in the lower right of the img2img Tab.
-Load and Save Canvas will save/load the entire Canvas as one Image.
+Load and Save Canvas will save/load the entire Canvas as one Image. Right clicking on the canvas will toggle between std and maximized size.
 
 Lets start with loading an image with the Load Canvas Button.
 
-![alpha03](https://user-images.githubusercontent.com/86352149/198783348-65915d71-1ca7-41d7-8263-12dd0571192a.jpg)
+![alpha2_1](https://user-images.githubusercontent.com/86352149/199514459-fb7e5c6e-f26b-47b5-bb8c-1fae1795cfeb.jpg)
 
-The Image will appear in the center of the canvas Element. clicking inside the canvas Element will define a 512x512 region with a rectangle, and, at the same time create a draggable Thumbnail in the upper Left Corner of the window.
+The Image will appear in the center of the canvas Element. clicking inside the canvas Element will define a 512x512 region with a rectangle, and, at the same time create a Thumbnail in the upper Left Corner of the window.
 
-Now dragg this Thumbnail to the srcImage Selection of img2img. Set denoising to 1.0 and use a matching prompt to the scene you want to expand. Then hit Generate. When the Images are complete hit the "Grab" Button to pull them into the Canvas Window.
+This works both for the img2img Tab (Alphacanvas script must be active, set denoising to 1.0)
+
+![alpha2_2](https://user-images.githubusercontent.com/86352149/199515072-0dfa8d92-9f1e-464b-8388-eb5e8e5eed55.jpg)
+
+And for the inpainting Tab. Which will upload a seperate alpha mask. (chosse latent noise and set denoising at 1.0)
+
+![alpha2_3](https://user-images.githubusercontent.com/86352149/199515609-aa5c8d6e-b386-4219-9fb3-3c22bb473423.jpg)
+
+Then hit Generate. When the Images are complete hit the "Grab" Button to pull them into the Canvas Window.
 
 ![alpha04](https://user-images.githubusercontent.com/86352149/198785744-9136571c-88fd-4c8c-8abd-b471b4e90244.jpg)
 
 Clicking on the choices on the right Side will display them in the big-Canvas Element too.
 
-![alpha05](https://user-images.githubusercontent.com/86352149/198786131-24602cef-5e49-4912-a6e5-346cf5e412b1.jpg)
+![alpha2_4](https://user-images.githubusercontent.com/86352149/199517887-23a43101-4f1b-4c39-b9e3-761a49d37df1.jpg)
 
-You can also make some basic Color Adjustments with the HSL Sliders. This will only affect newly generated Pixel-Values, and can help sometimes.
-
-![alpha06](https://user-images.githubusercontent.com/86352149/198787115-65f5dc6d-1082-4f57-955e-f758def862d6.jpg)
+![alpha2_5](https://user-images.githubusercontent.com/86352149/199517938-3430170b-adca-487c-992b-eb89b3b63681.jpg)
 
 When you are fine with one of the resulting image hit "Apply" und this Patch will now become a part of the canvas. 
 At this point the process can be repeated again and again.
 
-![alpha07](https://user-images.githubusercontent.com/86352149/198788069-692a1722-8389-4bf8-867b-9df73fceabe9.jpg)
+![alpha2_6](https://user-images.githubusercontent.com/86352149/199518469-abb867b0-13b8-4fdc-9c97-5e8cd95edb3c.jpg)
+
+Both Outpainting variants use different types of noise and both have advantages and disadvantages.
+The Outpainting in the img2img Tab uses black (0,0,0) as the marker Color und will fail if the image contains this color.
 
 Inpainting:
 ======
-The biggest change between Outpainting and Inpainting is that the script for Inpainting must be deselected. Only the selection and the read back are used.
+If the selected region does not contain transparent areas, the image will be transferred to the gradio interface normally. There you can use the marking tools as usual and at the end, just like in the outdraw variants, copy the images back.
 
-![alpha09](https://user-images.githubusercontent.com/86352149/198789363-049795a8-629a-4fdc-b750-6ffd23a1d030.jpg)
+![alpha2_7](https://user-images.githubusercontent.com/86352149/199520305-e4805097-a737-431d-8583-1cad997d827b.jpg)
 
-The selection process is the same, dragging the area are you want to edit in the src-Image of the Inpainting Tab.
-Marking that tree, telling the ai you want to see a hut in its place and hit generate. Once the Images are complete "Gather" them, and take a closer Look.
-
-
-![alpha10](https://user-images.githubusercontent.com/86352149/198790658-d931ed94-3f85-48b3-9884-49f9bc0e174f.jpg)
-
-![alpha11](https://user-images.githubusercontent.com/86352149/198790729-f57efe5f-c429-4cc1-acb5-18ea3f6fd8cf.jpg)
-
-And the HSL Control is working too.... Maybe a little bit more Saturation. Only applied to changed Pixels.
-
-![alpha12](https://user-images.githubusercontent.com/86352149/198791127-847f7e7a-536a-4f62-b193-64413fce9439.jpg)
 
