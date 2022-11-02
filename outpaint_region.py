@@ -357,21 +357,21 @@ class Script(scripts.Script):
                     }
                 }
                 gradioApp().getElementById('alphaHue').onchange = function(e) {
+                    gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + gradioApp().getElementById('alphaHue').value;
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
                         redrawCanvas();
-                        gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + gradioApp().getElementById('alphaHue').value;
                     }
                 }
                 gradioApp().getElementById('alphaSaturation').onchange = function(e) {
+                    gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + gradioApp().getElementById('alphaSaturation').value;
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
                         redrawCanvas();
-                        gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + gradioApp().getElementById('alphaSaturation').value;
                     }
                 }
                 gradioApp().getElementById('alphaLightness').onchange = function(e) {
+                    gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + gradioApp().getElementById('alphaLightness').value;
                     if (alphaCanvas.patched && alphaCanvas.storeImage) {
                         redrawCanvas();
-                        gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + gradioApp().getElementById('alphaLightness').value;
                     }
                 }
                 
