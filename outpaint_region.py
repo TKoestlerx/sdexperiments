@@ -723,6 +723,7 @@ class Script(scripts.Script):
                 alphaWindow.style.top = '0px';
                 alphaWindow.style.height = '50%';
                 alphaPosition.innerHTML = 'F';
+                alphaPosition.style.display = 'block';
                 alphaWindow.fullS = false;
             }
             if (alphaCanvas) {
