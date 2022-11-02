@@ -522,8 +522,8 @@ class Script(scripts.Script):
                     tempCanvas.width = 512;
                     tempCanvas.height = 512;
                     let ctx2 = tempCanvas.getContext('2d');
-                    ctx2.fillStyle = 'rgb(0,0,0)'
-                    ctx2.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    //ctx2.fillStyle = 'rgb(0,0,0)'
+                    //ctx2.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
                     ctx2.drawImage(alphaCanvas.storeImage, x-400, y-400, 512, 512,0,0,512,512);
                     alphaItem.src = tempCanvas.toDataURL('image/png');
                     alphaCanvas.lastX = x;
@@ -567,28 +567,132 @@ class Script(scripts.Script):
                 gradioApp().getElementById('alphaClose').onclick = function(e) {
                     alphaWindow.style.display = 'none';
                 }
-                gradioApp().getElementById('alphaItem').onclick= function(e) {
-                    const dt= new DataTransfer()
+
+                // rgba => rgb ( + mask)
+                function getImageMask(image) {
+                    const tempCanvas1 = document.createElement('canvas');
+                    const tempCanvas2 = document.createElement('canvas');
+                    tempCanvas1.width = 512;
+                    tempCanvas1.height = 512;
+                    tempCanvas2.width = 512;
+                    tempCanvas2.height = 512;
+                    let ctx1 = tempCanvas1.getContext('2d');
+                    let ctx2 = tempCanvas2.getContext('2d');
+                    ctx1.fillStyle = 'rgb(0,0,0)'
+                    ctx1.fillRect(0, 0, tempCanvas1.width, tempCanvas1.height);
+                    ctx1.drawImage(image, 0,0);
+                    ctx2.drawImage(image, 0,0);
+                    let pixel1 = ctx1.getImageData(0, 0, 512, 512);
+                    let pixelData1 = pixel1.data;
+                    let pixel2 = ctx2.getImageData(0, 0, 512, 512);
+                    let pixelData2 = pixel2.data;
+                    let transparentPixels = 0;
+                    for (let y=0;y<tempCanvas1.height;y++) {
+                        for (let x=0;x<tempCanvas1.width;x++) {
+                            const index = y*tempCanvas1.width*4+x*4;
+                            const pixelAlpha = pixelData2[index+3] < 255 ? 0 : 255;
+                            if (pixelAlpha<255) transparentPixels++;
+                            pixelData2[index] = 255 - pixelAlpha;
+                            pixelData2[index + 1] = 255 - pixelAlpha;
+                            pixelData2[index + 2] = 255 - pixelAlpha;
+                            pixelData2[index + 3] = 255;
+                        }
+                    }
+                    if (transparentPixels > 0) {
+                        ctx2.putImageData(pixel2, 0, 0);
+                        return [tempCanvas1.toDataURL('image/png'), tempCanvas2.toDataURL('image/png')]
+                    } else {
+                        return [tempCanvas1.toDataURL('image/png')];
+                    }
+                }
+
+                // send current Content of 'alphaItem' to the gradio interface.
+                function sendToGradio() {
+                    function setDrawMaskMode() {
+                        const modeParent = gradioApp().getElementById('mask_mode');
+                        const currentModes = modeParent.querySelectorAll('input[type="radio"]');
+                        currentModes[0].checked = true;
+                        currentModes[0].dispatchEvent(new Event('change'));
+                    }
+                    function setUploadMaskMode() {
+                        const modeParent = gradioApp().getElementById('mask_mode');
+                        const currentModes = modeParent.querySelectorAll('input[type="radio"]');
+                        currentModes[1].checked = true;
+                        currentModes[1].dispatchEvent(new Event('change'));
+                    }
+                    function zeroBlur() {
+                      const modeParent = gradioApp().getElementById('tab_img2img');
+                      const currentRanges = modeParent.querySelector('input[type="range"]');
+                      currentRanges.value = 0;
+                      currentRanges.dispatchEvent(new Event('input'));
+                    }
                     let fileString = gradioApp().getElementById('alphaItem').src;
-                    fetch(fileString).then(
-                        function ok(o) {
-                            o.blob().then(
-                                function ok2(o2) {
-                                    let file = new File([o2], "transfer.png", { type: 'image/png'})
-                                    dt.items.add(file);
-                                    let imgParent = gradioApp().getElementById('img2img_image');
-                                    if  (get_tab_index('mode_img2img')===1) {
-                                        imgParent = gradioApp().getElementById('img2maskimg');
-                                    }
-                                    const fileInput = imgParent.querySelector('input[type="file"]');
-                                    fileInput.files = dt.files;
-                                    fileInput.dispatchEvent(new Event('change'));
-                                },
-                                function failed2(e2) {
-                                });
-                        },
-                        function failed(e) {
-                        });
+                    if (!fileString) return;
+                    const maskedImage = getImageMask(gradioApp().getElementById('alphaItem'));
+                    if  (get_tab_index('mode_img2img')===1) { // send to Inpaint
+                        let imageTarget = gradioApp().getElementById('img2maskimg').querySelector('input[type="file"]');
+                        let maskTarget = '';
+                        if (maskedImage.length===1) { // real inpainting
+                            setDrawMaskMode();
+                        } else {
+                            setUploadMaskMode();
+                            zeroBlur();
+                            imageTarget = gradioApp().getElementById('img_inpaint_base').querySelector('input[type="file"]');
+                            maskTarget = gradioApp().getElementById('img_inpaint_mask').querySelector('input[type="file"]');
+                        }
+                        const dt1 = new DataTransfer()
+                        fetch(maskedImage[0]).then(
+                            function ok(o) {
+                                o.blob().then(
+                                    function ok2(o2) {
+                                        let file = new File([o2], "transferimage.png", { type: 'image/png'})
+                                        dt1.items.add(file);
+                                        imageTarget.files = dt1.files;
+                                        imageTarget.dispatchEvent(new Event('change'));
+                                    },
+                                    function failed2(e2) {
+                                    });
+                            },
+                            function failed(e) {
+                            });
+                        if (!maskTarget) return;
+                        const dt2 = new DataTransfer()
+                        fetch(maskedImage[1]).then(
+                            function ok(o) {
+                                o.blob().then(
+                                    function ok2(o2) {
+                                        let file = new File([o2], "transfermask.png", { type: 'image/png'})
+                                        dt2.items.add(file);
+                                        maskTarget.files = dt2.files;
+                                        maskTarget.dispatchEvent(new Event('change'));
+                                    },
+                                    function failed2(e2) {
+                                    });
+                            },
+                            function failed(e) {
+                            });
+                    } else { // send to img2img
+                        const dt= new DataTransfer()
+                        fetch(maskedImage[0]).then(
+                            function ok(o) {
+                                o.blob().then(
+                                    function ok2(o2) {
+                                        let file = new File([o2], "transfer.png", { type: 'image/png'})
+                                        dt.items.add(file);
+                                        let imgParent = gradioApp().getElementById('img2img_image');
+                                        const fileInput = imgParent.querySelector('input[type="file"]');
+                                        fileInput.files = dt.files;
+                                        fileInput.dispatchEvent(new Event('change'));
+                                    },
+                                    function failed2(e2) {
+                                    });
+                            },
+                            function failed(e) {
+                            });
+                    }
+                }
+                gradioApp().getElementById('alphaItem').onclick= function(e) {
+                    sendToGradio();
                     alphaCanvas.markedX = alphaCanvas.lastX;
                     alphaCanvas.markedY = alphaCanvas.lastY;
                     alphaCanvas.lastX = '';
@@ -632,6 +736,7 @@ class Script(scripts.Script):
         return [canvasButton,dummy]
 
     def run(self, p, canvasButton, dummy):
+        if p.image_mask: return None
         p.mask_blur = 0
         p.inpaint_full_res = False
         p.do_not_save_samples = True
