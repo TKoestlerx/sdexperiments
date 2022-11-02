@@ -35,6 +35,8 @@ Lets start with loading an image with the Load Canvas Button.
 
 The Image will appear in the center of the canvas Element. clicking inside the canvas Element will define a 512x512 region with a rectangle, and, at the same time create a Thumbnail in the upper Left Corner of the window.
 
+Clicking on the Thumbnail will transfer the data to the gradio Interface and draw a red rectangle to mark the active area.
+
 This works both for the img2img Tab (Alphacanvas script must be active, set denoising to 1.0)
 
 ![alpha2_2](https://user-images.githubusercontent.com/86352149/199515072-0dfa8d92-9f1e-464b-8388-eb5e8e5eed55.jpg)
