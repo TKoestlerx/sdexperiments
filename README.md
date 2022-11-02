@@ -7,8 +7,6 @@ Installation:
 Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable-diffusion-webui
 
 - currently hardcoded to 512x512
-- iterations currently not supported.
-- images containing the perfect "black" (0,0,0) will be problematic. (because it wants to draw over it) inpainting will be fine though.
 - "rough" ui. (canvas is created in gradio event handler)
 
 
@@ -23,6 +21,10 @@ Rightclick on canvas will toggle between fullscreen and windowed.
 Update III:
 Active Region (for copy back) will be marked with a red rectangle.
 
+Update IV:
+The script should no longer mess things up when left active in the inpainting Tab.
+
+If you are in the inpainting Tab and the region contains borders, an additional (alpha-) Mask will be generated and uploaded. Blur ist set to 0 (Because its never a good idea to blend with black and expect something useful). Fill mode should be set to noise and denoising to 1.0.
 
 Workflow:  
 =========
