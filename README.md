@@ -47,8 +47,6 @@ And for the inpainting Tab. Which will upload a seperate alpha mask. (chosse lat
 
 Then hit Generate. When the Images are complete hit the "Grab" Button to pull them into the Canvas Window.
 
-![alpha04](https://user-images.githubusercontent.com/86352149/198785744-9136571c-88fd-4c8c-8abd-b471b4e90244.jpg)
-
 Clicking on the choices on the right Side will display them in the big-Canvas Element too.
 
 ![alpha2_4](https://user-images.githubusercontent.com/86352149/199517887-23a43101-4f1b-4c39-b9e3-761a49d37df1.jpg)
