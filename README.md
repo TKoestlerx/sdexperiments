@@ -6,7 +6,7 @@ I have used the two existing outpainting scripts from the AUTOMATIC1111 repo as 
 Installation:
 Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable-diffusion-webui
 
-- currently hardcoded to 512x512
+- only square patch size (512x512 or 1024x1024) is supported
 - "rough" ui. (canvas is created in gradio event handler)
 
 Workflow:  
