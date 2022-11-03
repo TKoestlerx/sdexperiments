@@ -695,8 +695,6 @@ class Script(scripts.Script):
                     sendToGradio();
                     alphaCanvas.markedX = alphaCanvas.lastX;
                     alphaCanvas.markedY = alphaCanvas.lastY;
-                    alphaCanvas.lastX = '';
-                    alphaCanvas.lastY = '';
                     alphaCanvas.patched = '';
                     alphaSideMenu.innerHTML = '';
                     redrawCanvas();
