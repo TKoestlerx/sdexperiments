@@ -6,8 +6,17 @@ I have used the two existing outpainting scripts from the AUTOMATIC1111 repo as 
 Installation:
 Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable-diffusion-webui
 
-- currently hardcoded to 512x512
 - "rough" ui. (canvas is created in gradio event handler)
+
+Update:
+========
+Added support for width/height definition of the working area.
+
+Max Outpainting Range is now configurable.
+
+Added (basic) snapGrid.
+
+![alpha3_1](https://user-images.githubusercontent.com/86352149/201468821-3a192a64-9afc-40ea-9d32-2ab1bf99106f.jpg)
 
 Workflow:  
 =========
