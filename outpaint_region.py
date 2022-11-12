@@ -127,7 +127,9 @@ class Script(scripts.Script):
             return None
 
         canvasButton = gr.Button("Show/Hide AlphaCanvas")
-        dummy = gr.Slider(label="", minimum=-1, maximum=1, step=1, value=0)
+        SnapGrid = gr.Slider(label="snapGrid", minimum=1, maximum=16, step=1, value=8, elem_id="alphaSnap")
+        outerSize = gr.Slider(label="outPaintingSize max", minimum=128, maximum=768, step=128, value=384, elem_id="alphaOutSize")
+        outerSizeButton = gr.Button("Update Outpainting Size")
         
         javaScriptFunction = """(x) => {
             let alphaWindow,alphaPosition,alphaCanvas,alphaFile,alphaSideMenu,alphaItem,alphaTopMenu;
@@ -163,8 +165,23 @@ class Script(scripts.Script):
                      tabDiv.appendChild(Outer.firstChild);
                 }
 
+                alphaWindow = gradioApp().getElementById('alphaWindow');
+                alphaPosition = gradioApp().getElementById('alphaPosition');
+                alphaCanvas = gradioApp().getElementById('alphaCanvas');
+                alphaFile = gradioApp().getElementById('alphaFile');
+                alphaSideMenu = gradioApp().getElementById('alphaSideMenu');
+                alphaTopMenu = gradioApp().getElementById('alphaTopMenu');
+                alphaItem = gradioApp().getElementById('alphaItem');
+                alphaDownload = gradioApp().getElementById('alphaDownload');
+                alphaUpload = gradioApp().getElementById('alphaUpload');
+                alphaGrab = gradioApp().getElementById('alphaGrab');
+                alphaMerge = gradioApp().getElementById('alphaMerge');
+                alphaHue = gradioApp().getElementById('alphaHue');
+                alphaSaturation = gradioApp().getElementById('alphaSaturation');
+                alphaLightness = gradioApp().getElementById('alphaLightness');
+
                 // Fixed / Absolute
-                gradioApp().getElementById('alphaPosition').onclick = function(event) {
+                alphaPosition.onclick = function(event) {
                     if (alphaWindow.style.position==='absolute') {
                         alphaWindow.style.position = 'fixed';
                         alphaWindow.style.top = '100px';
@@ -218,13 +235,13 @@ class Script(scripts.Script):
                         document.onmousemove = null;
                     }
                 }
-                dragElement(gradioApp().getElementById('alphaWindow'),'alphaTitle');
+                dragElement(alphaWindow,'alphaTitle');
 
                 // Load File
                 function loadImage(image) {
                     let ctx = alphaCanvas.getContext('2d');
-                    alphaCanvas.width = image.width + 800;
-                    alphaCanvas.height = image.height + 800;
+                    alphaCanvas.width = image.width + alphaCanvas.alphaOuterSize * 2;
+                    alphaCanvas.height = image.height + alphaCanvas.alphaOuterSize * 2;
                     alphaCanvas.style.width = alphaCanvas.width + 'px';
                     alphaCanvas.style.height = alphaCanvas.height + 'px';
                     alphaCanvas.lastX = '';
@@ -234,10 +251,10 @@ class Script(scripts.Script):
                     alphaCanvas.patched = '';
                     alphaSideMenu.innerHTML = '';
                     ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
-                    ctx.drawImage(image, 400, 400);
+                    ctx.drawImage(image, alphaCanvas.alphaOuterSize, alphaCanvas.alphaOuterSize);
                     alphaCanvas.storeImage = image;                 
                 }
-                gradioApp().getElementById('alphaFile').onchange = function(e) {
+                alphaFile.onchange = function(e) {
                     let reader = new FileReader();
                     reader.onload = function(event){
                         let image = new Image();
@@ -248,29 +265,31 @@ class Script(scripts.Script):
                     }
                     reader.readAsDataURL(this.files[0]);
                 }
-                gradioApp().getElementById('alphaUpload').onclick = function(e) {
+                alphaUpload.onclick = function(e) {
                     alphaFile.click();
                 }
                 
                 // Save Image
-                gradioApp().getElementById('alphaDownload').onclick = function(e) {
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = alphaCanvas.width-800;
-                    tempCanvas.height = alphaCanvas.height-800;
-                    let ctx2 = tempCanvas.getContext('2d');
-                    ctx2.drawImage(alphaCanvas.storeImage, 0, 0);
-                    const link = document.createElement('a');
-                    link.download = 'canvas.png';
-                    link.href = tempCanvas.toDataURL();
-                    link.click();
-                    link.delete;
+                alphaDownload.onclick = function(e) {
+                    if (alphaCanvas.storeImage) {
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = alphaCanvas.width-alphaCanvas.alphaOuterSize*2;
+                        tempCanvas.height = alphaCanvas.height-alphaCanvas.alphaOuterSize*2;
+                        let ctx2 = tempCanvas.getContext('2d');
+                        ctx2.drawImage(alphaCanvas.storeImage, 0, 0);
+                        const link = document.createElement('a');
+                        link.download = 'canvas.png';
+                        link.href = tempCanvas.toDataURL();
+                        link.click();
+                        link.delete;
+                    }
                 };
                 
                 // Color Shifted Patch
                 function getColorShiftedPatch() {
-                    const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
-                    const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
-                    const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
+                    const colorShift = parseFloat(alphaHue.value);
+                    const saturationShift = parseFloat(alphaSaturation.value);
+                    const lightnessShift = parseFloat(alphaLightness.value);
                     
                     // HSL Functions from: https://gist.github.com/mjackson/5311256
                     function rgbToHsl(r, g, b) {
@@ -312,7 +331,7 @@ class Script(scripts.Script):
                       }
                       return [ r * 255, g * 255, b * 255 ];
                     }
-                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                    if (alphaCanvas.patched) {
                         const tempCanvasOrig = document.createElement('canvas');
                         tempCanvasOrig.width = alphaCanvas.patched.width;
                         tempCanvasOrig.height = alphaCanvas.patched.height;
@@ -321,7 +340,9 @@ class Script(scripts.Script):
                         tempCanvasNew.width = alphaCanvas.patched.width;
                         tempCanvasNew.height = alphaCanvas.patched.height;
                         let ctx2 = tempCanvasNew.getContext('2d');
-                        ctx1.drawImage(alphaCanvas.storeImage,alphaCanvas.patchedX-400,alphaCanvas.patchedY-400,512,512,0,0,512,512);
+                        if (alphaCanvas.storeImage) {
+                            ctx1.drawImage(alphaCanvas.storeImage,alphaCanvas.patchedX-alphaCanvas.alphaOuterSize,alphaCanvas.patchedY-alphaCanvas.alphaOuterSize,tempCanvasNew.width,tempCanvasNew.height,0,0,tempCanvasNew.width,tempCanvasNew.height);
+                        }
                         ctx2.drawImage(alphaCanvas.patched, 0, 0);
                         let pixelData1 = ctx1.getImageData(0, 0, tempCanvasOrig.width, tempCanvasOrig.height).data;
                         let pixel2 = ctx2.getImageData(0, 0, tempCanvasNew.width, tempCanvasNew.height);
@@ -356,50 +377,52 @@ class Script(scripts.Script):
                         return tempCanvasNew;
                     }
                 }
-                gradioApp().getElementById('alphaHue').onchange = function(e) {
-                    gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + gradioApp().getElementById('alphaHue').value;
-                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                alphaHue.onchange = function(e) {
+                    gradioApp().getElementById('alphaHueLabel').innerHTML = 'Hue:' + alphaHue.value;
+                    if (alphaCanvas.patched) {
                         redrawCanvas();
                     }
                 }
-                gradioApp().getElementById('alphaSaturation').onchange = function(e) {
-                    gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + gradioApp().getElementById('alphaSaturation').value;
-                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                alphaSaturation.onchange = function(e) {
+                    gradioApp().getElementById('alphaSaturationLabel').innerHTML = 'S:' + alphaSaturation.value;
+                    if (alphaCanvas.patched) {
                         redrawCanvas();
                     }
                 }
-                gradioApp().getElementById('alphaLightness').onchange = function(e) {
-                    gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + gradioApp().getElementById('alphaLightness').value;
-                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                alphaLightness.onchange = function(e) {
+                    gradioApp().getElementById('alphaLightnessLabel').innerHTML = 'L:' + alphaLightness.value;
+                    if (alphaCanvas.patched) {
                         redrawCanvas();
                     }
                 }
                 
-                gradioApp().getElementById('alphaMerge').onclick = function(e) {
-                    if (alphaCanvas.patched && alphaCanvas.storeImage) {
+                alphaMerge.onclick = function(e) {
+                    if (alphaCanvas.patched) {
                         let leftShift = 0;
                         let topShift = 0;
-                        let xMove = alphaCanvas.patchedX - 400;
-                        let yMove = alphaCanvas.patchedY - 400;
+                        let xMove = alphaCanvas.patchedX - alphaCanvas.alphaOuterSize;
+                        let yMove = alphaCanvas.patchedY - alphaCanvas.alphaOuterSize;
                         let newwidth = alphaCanvas.storeImage.width;
                         let newheight = alphaCanvas.storeImage.height;
-                        if (alphaCanvas.patchedX < 400) {
-                            newwidth = newwidth + (400 - alphaCanvas.patchedX);
-                            leftShift = (400 - alphaCanvas.patchedX);
+                        if (alphaCanvas.patchedX < alphaCanvas.alphaOuterSize) {
+                            newwidth = newwidth + (alphaCanvas.alphaOuterSize - alphaCanvas.patchedX);
+                            leftShift = (alphaCanvas.alphaOuterSize - alphaCanvas.patchedX);
                             xMove = 0;
                         }
-                        if (alphaCanvas.patchedY < 400) {
-                            newheight = newheight + (400 - alphaCanvas.patchedY);
-                            topShift = (400 - alphaCanvas.patchedY);
+                        if (alphaCanvas.patchedY < alphaCanvas.alphaOuterSize) {
+                            newheight = newheight + (alphaCanvas.alphaOuterSize - alphaCanvas.patchedY);
+                            topShift = (alphaCanvas.alphaOuterSize - alphaCanvas.patchedY);
                             yMove = 0;
                         }
-                        if (alphaCanvas.patchedX + 112 >newwidth) newwidth = alphaCanvas.patchedX + 112;
-                        if (alphaCanvas.patchedY + 112 >newheight) newheight = alphaCanvas.patchedY + 112;
+                        if (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize >newwidth) newwidth = alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize;
+                        if (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize >newheight) newheight = alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize;
                         const tempCanvas = document.createElement('canvas');
                         tempCanvas.width = newwidth;
                         tempCanvas.height = newheight;
                         let ctx2 = tempCanvas.getContext('2d');
-                        ctx2.drawImage(alphaCanvas.storeImage, leftShift, topShift);
+                        if (alphaCanvas.storeImage) {
+                            ctx2.drawImage(alphaCanvas.storeImage, leftShift, topShift);
+                        }
                         const shiftedImage = getColorShiftedPatch();
                         ctx2.drawImage(shiftedImage, xMove, yMove);
                         alphaCanvas.patched = ''
@@ -414,22 +437,13 @@ class Script(scripts.Script):
                 function importRegion(image) {
                     let ctx = alphaCanvas.getContext('2d');
                     const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = 512;
-                    tempCanvas.height = 512;
+                    tempCanvas.width = alphaCanvas.alphaWindowWidth;
+                    tempCanvas.height = alphaCanvas.alphaWindowHeight;
                     let ctx2 = tempCanvas.getContext('2d');
                     ctx2.drawImage(image, 0,0);
                     alphaCanvas.patched = tempCanvas;
                     alphaCanvas.patchedX = alphaCanvas.markedX;
                     alphaCanvas.patchedY = alphaCanvas.markedY;
-                }
-                
-                function convertToDataUrl(image) {
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = 512;
-                    tempCanvas.height = 512;
-                    let ctx2 = tempCanvas.getContext('2d');
-                    ctx2.drawImage(image, 0,0);
-                    return tempCanvas.toDataURL('image/png');
                 }
 
                 // Import results
@@ -438,10 +452,8 @@ class Script(scripts.Script):
                     const choices = imgParent.getElementsByClassName('gallery-item group');
                     let nr = 0;
                     alphaSideMenu.innerHTML = '';
-                    console.info('reading results... checking ' + choices.length + ' elements.');
                     for (choice in choices) {
                         if (choices[choice].children && choices[choice].children[0]) {
-                            console.info('creating new img Element');
                             let image2 = new Image();
                             image2.style.right = '20px';
                             image2.style.top = (nr*70)+'px';
@@ -452,7 +464,6 @@ class Script(scripts.Script):
                             image2.style.zIndex = '1';
                             alphaSideMenu.append(image2);
                             image2.onload = function() {
-                                console.info('result image load complete.');
                             };
                             image2.onclick = function(e) {
                                 if (alphaCanvas.markedX) {
@@ -462,25 +473,25 @@ class Script(scripts.Script):
                                     console.info('dont know where to put this region.');
                                 }
                             }
-                            //image2.src = convertToDataUrl(choices[choice].children[0]);
                             image2.src = choices[choice].children[0].src;
                             nr++;
                         }
                     }
-                    console.info('importing results complete. ' + nr + ' images');
                 }
-                gradioApp().getElementById('alphaGrab').onclick = function(e) {
+                alphaGrab.onclick = function(e) {
                     getImages();
                 }
 
                 function redrawCanvas() {
                     let ctx = alphaCanvas.getContext('2d');
                     ctx.clearRect(0, 0, alphaCanvas.width, alphaCanvas.height);
-                    ctx.drawImage(alphaCanvas.storeImage, 400, 400, alphaCanvas.width-800, alphaCanvas.height-800);
+                    if (alphaCanvas.storeImage) {
+                        ctx.drawImage(alphaCanvas.storeImage, alphaCanvas.alphaOuterSize, alphaCanvas.alphaOuterSize, alphaCanvas.width-alphaCanvas.alphaOuterSize*2, alphaCanvas.height-alphaCanvas.alphaOuterSize*2);
+                    }
                     if (alphaCanvas.patched) {
-                        const colorShift = parseFloat(gradioApp().getElementById('alphaHue').value);
-                        const saturationShift = parseFloat(gradioApp().getElementById('alphaSaturation').value);
-                        const lightnessShift = parseFloat(gradioApp().getElementById('alphaLightness').value);
+                        const colorShift = parseFloat(alphaHue.value);
+                        const saturationShift = parseFloat(alphaSaturation.value);
+                        const lightnessShift = parseFloat(alphaLightness.value);
                         if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
                           const shiftedImage = getColorShiftedPatch()
                           ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
@@ -493,12 +504,12 @@ class Script(scripts.Script):
                         ctx.beginPath();
                         ctx.lineWidth = '1';
                         ctx.strokeStyle = 'white';
-                        ctx.rect(alphaCanvas.lastX, alphaCanvas.lastY, 512, 512);
+                        ctx.rect(alphaCanvas.lastX, alphaCanvas.lastY, alphaCanvas.alphaWindowWidth, alphaCanvas.alphaWindowHeight);
                         ctx.stroke();
                         ctx.beginPath();
                         ctx.lineWidth = '1';
                         ctx.strokeStyle = 'black';
-                        ctx.rect(alphaCanvas.lastX-1, alphaCanvas.lastY-1, 514, 514);
+                        ctx.rect(alphaCanvas.lastX-1, alphaCanvas.lastY-1, alphaCanvas.alphaWindowWidth + 2, alphaCanvas.alphaWindowHeight + 2);
                         ctx.stroke();
                     }
                     // drop marker
@@ -506,31 +517,54 @@ class Script(scripts.Script):
                         ctx.beginPath();
                         ctx.lineWidth = '1';
                         ctx.strokeStyle = 'red';
-                        ctx.rect(alphaCanvas.markedX, alphaCanvas.markedY, 512, 512);
+                        ctx.rect(alphaCanvas.markedX, alphaCanvas.markedY, alphaCanvas.alphaWindowWidth, alphaCanvas.alphaWindowHeight);
                         ctx.stroke();
                     }  
                 }
+                
                 // Select Working Region
-                gradioApp().getElementById('alphaCanvas').onclick = function(event) {
+                alphaCanvas.alphaWindowWidth = parseInt(gradioApp().getElementById('img2img_width').querySelector('input[type="range"]').value);
+                alphaCanvas.alphaWindowHeight = parseInt(gradioApp().getElementById('img2img_height').querySelector('input[type="range"]').value);
+                alphaCanvas.alphaOuterSize = parseInt(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value);
+                alphaCanvas.onclick = function(event) {
                     event.stopPropagation();
+                    alphaWindowWidth = parseInt(gradioApp().getElementById('img2img_width').querySelector('input[type="range"]').value);
+                    alphaWindowHeight = parseInt(gradioApp().getElementById('img2img_height').querySelector('input[type="range"]').value);
+                    if (alphaCanvas.alphaWindowWidth!==alphaWindowWidth || alphaCanvas.alphaWindowHeight!==alphaWindowHeight) {
+                      alphaCanvas.alphaWindowWidth = alphaWindowWidth;
+                      alphaCanvas.alphaWindowHeight = alphaWindowHeight;
+                      alphaCanvas.markedX = '';
+                      alphaCanvas.markedY = '';
+                      alphaCanvas.patched = '';
+                    }
+                    alphaSnap = parseInt(gradioApp().getElementById('alphaSnap').querySelector('input[type="range"]').value);
                     let rect = alphaCanvas.getBoundingClientRect();
-                    let x = Math.floor(event.clientX - rect.left) - 256;
-                    let y = Math.floor(event.clientY - rect.top) - 256;
+                    let x = Math.floor(event.clientX - rect.left) - alphaCanvas.alphaWindowWidth / 2;
+                    let y = Math.floor(event.clientY - rect.top) - alphaCanvas.alphaWindowHeight / 2;
+                    x = Math.floor(x/alphaSnap) * alphaSnap;
+                    y = Math.floor(y/alphaSnap) * alphaSnap;
                     if (x < 0 || y<0) return;
-                    if (x > alphaCanvas.width - 512 || y > alphaCanvas.height - 512) return;           
+                    if (x > alphaCanvas.width - alphaCanvas.alphaWindowWidth || y > alphaCanvas.height - alphaCanvas.alphaWindowHeight) return;           
                     const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = 512;
-                    tempCanvas.height = 512;
+                    tempCanvas.width = alphaCanvas.alphaWindowWidth;
+                    tempCanvas.height = alphaCanvas.alphaWindowHeight;
                     let ctx2 = tempCanvas.getContext('2d');
-                    //ctx2.fillStyle = 'rgb(0,0,0)'
-                    //ctx2.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-                    ctx2.drawImage(alphaCanvas.storeImage, x-400, y-400, 512, 512,0,0,512,512);
+                    if (alphaCanvas.storeImage) {
+                        ctx2.drawImage(alphaCanvas.storeImage, x-alphaCanvas.alphaOuterSize, y-alphaCanvas.alphaOuterSize, tempCanvas.width, tempCanvas.height,0,0,tempCanvas.width,tempCanvas.height);
+                    }
                     alphaItem.src = tempCanvas.toDataURL('image/png');
                     alphaCanvas.lastX = x;
                     alphaCanvas.lastY = y;
                     redrawCanvas();
                 }
-
+                alphaCanvas.updateOuterSize = function() {
+                    alphaCanvas.alphaOuterSize = parseInt(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value);
+                    if (alphaCanvas.storeImage) {
+                        loadImage(alphaCanvas.storeImage);
+                    } else {
+                        redrawCanvas();
+                    }
+                }
                 // full window on right click
                 function toggleFullScreen(event) {
                     event.preventDefault();
@@ -572,19 +606,19 @@ class Script(scripts.Script):
                 function getImageMask(image) {
                     const tempCanvas1 = document.createElement('canvas');
                     const tempCanvas2 = document.createElement('canvas');
-                    tempCanvas1.width = 512;
-                    tempCanvas1.height = 512;
-                    tempCanvas2.width = 512;
-                    tempCanvas2.height = 512;
+                    tempCanvas1.width = alphaCanvas.alphaWindowWidth;
+                    tempCanvas1.height = alphaCanvas.alphaWindowHeight;
+                    tempCanvas2.width = alphaCanvas.alphaWindowWidth;
+                    tempCanvas2.height = alphaCanvas.alphaWindowHeight;
                     let ctx1 = tempCanvas1.getContext('2d');
                     let ctx2 = tempCanvas2.getContext('2d');
                     ctx1.fillStyle = 'rgb(0,0,0)'
                     ctx1.fillRect(0, 0, tempCanvas1.width, tempCanvas1.height);
                     ctx1.drawImage(image, 0,0);
                     ctx2.drawImage(image, 0,0);
-                    let pixel1 = ctx1.getImageData(0, 0, 512, 512);
+                    let pixel1 = ctx1.getImageData(0, 0, tempCanvas1.width, tempCanvas1.height);
                     let pixelData1 = pixel1.data;
-                    let pixel2 = ctx2.getImageData(0, 0, 512, 512);
+                    let pixel2 = ctx2.getImageData(0, 0, tempCanvas1.width, tempCanvas1.height);
                     let pixelData2 = pixel2.data;
                     let transparentPixels = 0;
                     for (let y=0;y<tempCanvas1.height;y++) {
@@ -626,7 +660,7 @@ class Script(scripts.Script):
                       currentRanges.value = 0;
                       currentRanges.dispatchEvent(new Event('input'));
                     }
-                    let fileString = gradioApp().getElementById('alphaItem').src;
+                    let fileString = alphaItem.src;
                     if (!fileString) return;
                     const maskedImage = getImageMask(gradioApp().getElementById('alphaItem'));
                     if  (get_tab_index('mode_img2img')===1) { // send to Inpaint
@@ -707,10 +741,17 @@ class Script(scripts.Script):
             alphaSideMenu = gradioApp().getElementById('alphaSideMenu');
             alphaTopMenu = gradioApp().getElementById('alphaTopMenu');
             alphaItem = gradioApp().getElementById('alphaItem');
+            alphaDownload = gradioApp().getElementById('alphaDownload');
+            alphaUpload = gradioApp().getElementById('alphaUpload');
+            alphaGrab = gradioApp().getElementById('alphaGrab');
+            alphaMerge = gradioApp().getElementById('alphaMerge');
+            alphaHue = gradioApp().getElementById('alphaHue');
+            alphaSaturation = gradioApp().getElementById('alphaSaturation');
+            alphaLightness = gradioApp().getElementById('alphaLightness');
             
             if (alphaWindow.style.display!=='none') {
                 alphaWindow.style.display = 'none';
-                return 0;
+                return gradioApp().getElementById('alphaSnap').querySelector('input[type="range"]').value;
             }
 
             function resetView() {
@@ -729,12 +770,21 @@ class Script(scripts.Script):
             } else {
                 console.info('failed to get Image data');
             }
-        return 0}"""
+        return gradioApp().getElementById('alphaSnap').querySelector('input[type="range"]').value}"""
+        
+        javaScriptFunction2 = """(x2) => {
+           let slider = parseFloat(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value)
+           let canvas = gradioApp().getElementById('alphaCanvas')
+           if (canvas) {
+             canvas.updateOuterSize();
+           }
+        return slider}"""
 
-        canvasButton.click(None, [], dummy, _js = javaScriptFunction)
-        return [canvasButton,dummy]
+        canvasButton.click(None, [], SnapGrid, _js = javaScriptFunction)
+        outerSizeButton.click(None, [], outerSize, _js = javaScriptFunction2)
+        return [canvasButton,outerSize,outerSizeButton,SnapGrid]
 
-    def run(self, p, canvasButton, dummy):
+    def run(self, p, canvasButton,outerSize,outerSizeButton,SnapGrid):
         if p.image_mask: return None
         p.mask_blur = 0
         p.inpaint_full_res = False
@@ -755,16 +805,12 @@ class Script(scripts.Script):
         np_mask = (np.asarray(p.image_mask.convert('RGB')) / 255.0).astype(np.float64)
         noised = get_matched_noise(np_image, np_mask)
         workItem = Image.fromarray(np.clip(noised * 255., 0., 255.).astype(np.uint8), mode="RGB")
-        workImages = []
-        for n in range(p.batch_size):
-          workImages.append(workItem)
-        p.init_images = workImages
+        p.init_images[0] = workItem
         p.latent_mask = None
         proc = process_images(p)
         results = []
-        for n in range(p.batch_size):
-          proc_img = proc.images[n]
+        for n in range(len(proc.images)):
           final_image = newBase.copy()
-          final_image.paste(proc_img,(0,0))
+          final_image.paste(proc.images[n],(0,0))
           proc.images[n] = final_image
         return proc
