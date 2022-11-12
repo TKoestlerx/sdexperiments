@@ -10,7 +10,9 @@ Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable
 
 Update:
 ========
-Added support for width/height definition of the working area.
+Added support for width/height definition of the working area using the default gradio sliders
+
+![alpha3_0](https://user-images.githubusercontent.com/86352149/201469455-e6cc2c8a-25ee-429c-bc1b-cef0b7166af1.jpg)
 
 Max Outpainting Range is now configurable.
 
