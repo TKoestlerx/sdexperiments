@@ -449,7 +449,12 @@ class Script(scripts.Script):
                 // Import results
                 function getImages() {
                     let imgParent = gradioApp().getElementById('img2img_gallery');
-                    const choices = imgParent.getElementsByClassName('gallery-item group');
+                    let choices_t = imgParent.getElementsByClassName('gallery-item group');
+    	            if (choices_t.length==0) {
+                        console.info('choices empty. Using alternative method');
+                        choices_t = imgParent.getElementsByClassName('gallery-item svelte-1g9btlg');
+                    }
+                    const choices = choices_t;
                     let nr = 0;
                     alphaSideMenu.innerHTML = '';
                     for (choice in choices) {
