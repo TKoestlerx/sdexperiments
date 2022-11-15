@@ -137,7 +137,7 @@ class Script(scripts.Script):
                 console.info('first run. create Canvas.');
                 let tabDiv = gradioApp().getElementById('tab_img2img');
                 let Outer = document.createElement('div');
-                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden;resize:both;border-radius:5px;border: 1px solid black;'>
+                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden !important;resize:both;border-radius:5px;border: 1px solid black;' class='gr-panel'>
                             <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>A</div>
                             <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#444444;color:#ffffff;padding-left: 5px;'>AlphaCanvas</div>
                             <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;position:absolute' class='gr-button gr-button-lg gr-button-secondary'>Close</div>
@@ -155,8 +155,8 @@ class Script(scripts.Script):
                                 <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Load Canvas</div>
                                 <div id='alphaDownload' style='left:42%;top:41px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Save Canvas</div>
                             </div>
-                            <div id='alphaSideMenu' style='right:0px;top:110px;width:80px;bottom:10px;display:flex;position:absolute;flex-direction:column;' class='gr-panel'></div>
-                            <div id='alphaCanvasContainer' style='left:0px;top:110px;right:100px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
+                            <div id='alphaSideMenu' style='right:0px;top:110px;width:80px;bottom:10px;display:flex;position:absolute;flex-direction:column;overflow-x:hidden !important;overflow-y:auto !important;' class='gr-panel'></div>
+                            <div id='alphaCanvasContainer' style='left:0px;top:110px;right:80px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
                                 <canvas id='alphaCanvas' style='display:block;position:absolute;left:0px;top:0px;'></canvas>
                             </div>
                         </div>`;
@@ -578,7 +578,6 @@ class Script(scripts.Script):
                         alphaWindow.style.top = alphaWindow.oldPosTop;
                         alphaWindow.style.height = alphaWindow.oldHeight;
                         alphaPosition.innerHTML = alphaWindow.oldPosString;
-                        alphaWindow.className = '';
                         alphaPosition.style.display = '';
                         alphaWindow.fullS = false;
                     } else {
@@ -590,7 +589,6 @@ class Script(scripts.Script):
                         alphaWindow.oldPosString = alphaPosition.innerHTML;
                         alphaPosition.style.display = 'none';
                         alphaWindow.fullS = true;
-                        alphaWindow.className = 'gr-panel';
                         alphaWindow.style.position = 'fixed';
                         alphaWindow.style.left = '0px';
                         alphaWindow.style.width = '100%';
