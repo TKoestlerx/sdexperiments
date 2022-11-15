@@ -578,6 +578,7 @@ class Script(scripts.Script):
                         alphaWindow.style.top = alphaWindow.oldPosTop;
                         alphaWindow.style.height = alphaWindow.oldHeight;
                         alphaPosition.innerHTML = alphaWindow.oldPosString;
+                        alphaWindow.className = '';
                         alphaPosition.style.display = '';
                         alphaWindow.fullS = false;
                     } else {
@@ -589,6 +590,7 @@ class Script(scripts.Script):
                         alphaWindow.oldPosString = alphaPosition.innerHTML;
                         alphaPosition.style.display = 'none';
                         alphaWindow.fullS = true;
+                        alphaWindow.className = 'gr-panel';
                         alphaWindow.style.position = 'fixed';
                         alphaWindow.style.left = '0px';
                         alphaWindow.style.width = '100%';
