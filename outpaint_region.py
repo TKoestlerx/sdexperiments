@@ -130,33 +130,33 @@ class Script(scripts.Script):
         SnapGrid = gr.Slider(label="snapGrid", minimum=1, maximum=16, step=1, value=8, elem_id="alphaSnap")
         outerSize = gr.Slider(label="outPaintingSize max", minimum=128, maximum=768, step=128, value=384, elem_id="alphaOutSize")
         outerSizeButton = gr.Button("Update Outpainting Size")
-        
+
         javaScriptFunction = """(x) => {
             let alphaWindow,alphaPosition,alphaCanvas,alphaFile,alphaSideMenu,alphaItem,alphaTopMenu;
             if (!gradioApp().getElementById('alphaWindow')) {
                 console.info('first run. create Canvas.');
                 let tabDiv = gradioApp().getElementById('tab_img2img');
                 let Outer = document.createElement('div');
-                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden;resize:both;background:#f0f0f0;border-radius:5px;border: 1px solid black;'>
-                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;display:block;position:absolute;background:#ffffff;color:#000000'>A</div>
-                            <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#4444cc;color:#ffffff;padding-left: 5px;'>AlphaCanvas</div>
-                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;display:block;position:absolute;background:#ffeeee;color:#000000;border:1px solid black;padding-left: 5px;'>Close</div>
+                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden;resize:both;border-radius:5px;border: 1px solid black;'>
+                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>A</div>
+                            <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#444444;color:#ffffff;padding-left: 5px;'>AlphaCanvas</div>
+                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;position:absolute' class='gr-button gr-button-lg gr-button-secondary'>Close</div>
                             <input id='alphaFile' style='display:none' type='file'></input>
-                            <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:64px;display:block;position:absolute;background:#eeeeff'>
-                                <img id='alphaItem' style='left:5px;top:0px;width:64px;height:64px;display:block;position:absolute'/>
-                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden;color:#000000'>Grab Results</div>
-                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;overflow:hidden;color:#000000'>Apply Patch</div>
-                                <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute;color:#000000'>Hue:0</div>
-                                <input id='alphaSaturation' style='left:75px;top:21px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute;color:#000000'>S:0</div>
-                                <input id='alphaLightness' style='left:75px;top:42px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.1', max='0.1', value='0.0' step='0.01'></input>
-                                <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute;color:#000000'>L:0</div>
-                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;color:#000000'>Load Canvas</div>
-                                <div id='alphaDownload' style='left:42%;top:33px;width:15%;height:30px;display:block;position:absolute;background:#ddddff;border:1px solid black;padding-left: 5px;color:#000000'>Save Canvas</div>
+                            <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:80px;display:block;position:absolute;' class='gr-panel'>
+                                <img id='alphaItem' style='left:5px;top:8px;width:64px;height:64px;display:block;position:absolute;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)''/>
+                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:40px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Grab Results</div>
+                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:40px;position:absolute' class='gr-button gr-button-lg gr-button-secondary'>Apply Patch</div>
+                                <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
+                                <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>Hue:0</div>
+                                <input id='alphaSaturation' style='left:75px;top:21px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
+                                <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>S:0</div>
+                                <input id='alphaLightness' style='left:75px;top:42px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
+                                <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>L:0</div>
+                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Load Canvas</div>
+                                <div id='alphaDownload' style='left:42%;top:41px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Save Canvas</div>
                             </div>
-                            <div id='alphaSideMenu' style='right:0px;top:100px;width:64px;bottom:0px;display:block;position:absolute;background:#eeeeff'></div>
-                            <div id='alphaCanvasContainer' style='left:0px;top:100px;right:80px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
+                            <div id='alphaSideMenu' style='right:0px;top:110px;width:80px;bottom:10px;display:flex;position:absolute;flex-direction:column;' class='gr-panel'></div>
+                            <div id='alphaCanvasContainer' style='left:0px;top:110px;right:100px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
                                 <canvas id='alphaCanvas' style='display:block;position:absolute;left:0px;top:0px;'></canvas>
                             </div>
                         </div>`;
@@ -455,17 +455,15 @@ class Script(scripts.Script):
                         choices_t = imgParent.getElementsByClassName('gallery-item svelte-1g9btlg');
                     }
                     const choices = choices_t;
-                    let nr = 0;
                     alphaSideMenu.innerHTML = '';
                     for (choice in choices) {
                         if (choices[choice].children && choices[choice].children[0]) {
                             let image2 = new Image();
-                            image2.style.right = '20px';
-                            image2.style.top = (nr*70)+'px';
                             image2.style.width = '64px';
                             image2.style.height = '64px';
                             image2.style.display = 'block';
-                            image2.style.position = 'absolute';
+                            image2.style.position = 'relative';
+                            image2.style.padding = '8px';
                             image2.style.zIndex = '1';
                             alphaSideMenu.append(image2);
                             image2.onload = function() {
@@ -479,7 +477,6 @@ class Script(scripts.Script):
                                 }
                             }
                             image2.src = choices[choice].children[0].src;
-                            nr++;
                         }
                     }
                 }
@@ -497,7 +494,7 @@ class Script(scripts.Script):
                         const colorShift = parseFloat(alphaHue.value);
                         const saturationShift = parseFloat(alphaSaturation.value);
                         const lightnessShift = parseFloat(alphaLightness.value);
-                        if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.005) {
+                        if (Math.abs(colorShift)+Math.abs(saturationShift)+Math.abs(lightnessShift)>0.001) {
                           const shiftedImage = getColorShiftedPatch()
                           ctx.drawImage(shiftedImage, alphaCanvas.markedX, alphaCanvas.markedY);
                         } else {
@@ -581,7 +578,7 @@ class Script(scripts.Script):
                         alphaWindow.style.top = alphaWindow.oldPosTop;
                         alphaWindow.style.height = alphaWindow.oldHeight;
                         alphaPosition.innerHTML = alphaWindow.oldPosString;
-                        alphaPosition.style.display = 'block';
+                        alphaPosition.style.display = '';
                         alphaWindow.fullS = false;
                     } else {
                         alphaWindow.oldPos = alphaWindow.style.position;
@@ -767,11 +764,34 @@ class Script(scripts.Script):
                 alphaWindow.style.top = '0px';
                 alphaWindow.style.height = '50%';
                 alphaPosition.innerHTML = 'F';
-                alphaPosition.style.display = 'block';
+                alphaPosition.style.display = '';
                 alphaWindow.fullS = false;
             }
+            function findHome() {
+                function getOffset(el) {
+                    const rect = el.getBoundingClientRect();
+                    return {
+                        left: rect.left + window.scrollX,
+                        top: rect.top + window.scrollY
+                    };
+                }
+                let gradioSaveButton = gradioApp().getElementById('save_img2img')
+                if (gradioSaveButton) {
+                    alphaWindow.style.display = 'block';
+                    alphaWindow.style.position = 'absolute';
+                    alphaWindow.style.left = '50%'
+                    alphaWindow.style.width = '48%';
+                    alphaWindow.style.top = (getOffset(gradioSaveButton).top + 100) +'px'
+                    alphaWindow.style.height = '600px';
+                    alphaPosition.innerHTML = 'A';
+                    alphaPosition.style.display = '';
+                    alphaWindow.fullS = false;
+                } else {
+                    resetView();
+                }
+            }
             if (alphaCanvas) {
-                resetView();
+                findHome();
             } else {
                 console.info('failed to get Image data');
             }
