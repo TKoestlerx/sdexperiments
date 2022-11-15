@@ -402,23 +402,27 @@ class Script(scripts.Script):
                         let topShift = 0;
                         let xMove = alphaCanvas.patchedX - alphaCanvas.alphaOuterSize;
                         let yMove = alphaCanvas.patchedY - alphaCanvas.alphaOuterSize;
-                        let newwidth = alphaCanvas.storeImage.width;
-                        let newheight = alphaCanvas.storeImage.height;
+                        let newWidth = alphaCanvas.storeImage.width;
+                        let newHeight = alphaCanvas.storeImage.height;
+                        let expandWidth = 0;
+                        let expandHeight = 0;
                         if (alphaCanvas.patchedX < alphaCanvas.alphaOuterSize) {
-                            newwidth = newwidth + (alphaCanvas.alphaOuterSize - alphaCanvas.patchedX);
+                            expandWidth = alphaCanvas.alphaOuterSize - alphaCanvas.patchedX;
                             leftShift = (alphaCanvas.alphaOuterSize - alphaCanvas.patchedX);
                             xMove = 0;
                         }
                         if (alphaCanvas.patchedY < alphaCanvas.alphaOuterSize) {
-                            newheight = newheight + (alphaCanvas.alphaOuterSize - alphaCanvas.patchedY);
+                            expandHeight = alphaCanvas.alphaOuterSize - alphaCanvas.patchedY;
                             topShift = (alphaCanvas.alphaOuterSize - alphaCanvas.patchedY);
                             yMove = 0;
                         }
-                        if (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize >newwidth) newwidth = alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize;
-                        if (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize >newheight) newheight = alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize;
+                        if (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize >newWidth) expandWidth+= (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize) - newWidth;
+                        if (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize >newWidth) expandHeight += (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize) - newHeight;
+                        newWidth = newWidth + expandWidth;
+                        newHeight = newHeight + expandHeight;
                         const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = newwidth;
-                        tempCanvas.height = newheight;
+                        tempCanvas.width = newWidth;
+                        tempCanvas.height = newHeight;
                         let ctx2 = tempCanvas.getContext('2d');
                         if (alphaCanvas.storeImage) {
                             ctx2.drawImage(alphaCanvas.storeImage, leftShift, topShift);
@@ -435,15 +439,32 @@ class Script(scripts.Script):
                 
                 
                 function importRegion(image) {
-                    let ctx = alphaCanvas.getContext('2d');
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = alphaCanvas.alphaWindowWidth;
-                    tempCanvas.height = alphaCanvas.alphaWindowHeight;
-                    let ctx2 = tempCanvas.getContext('2d');
-                    ctx2.drawImage(image, 0,0);
-                    alphaCanvas.patched = tempCanvas;
-                    alphaCanvas.patchedX = alphaCanvas.markedX;
-                    alphaCanvas.patchedY = alphaCanvas.markedY;
+                    function deselectAll(node) {
+                        for (let i=0;i<node.children.length;i++) {
+                            node.children[i].style.background = ''
+                            node.children[i].currentPatch = false;
+                        }
+                    }
+                    if (!image.currentPatch) {
+                        deselectAll(image.parentNode);
+                        let ctx = alphaCanvas.getContext('2d');
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = alphaCanvas.alphaWindowWidth;
+                        tempCanvas.height = alphaCanvas.alphaWindowHeight;
+                        let ctx2 = tempCanvas.getContext('2d');
+                        ctx2.drawImage(image, 0,0);
+                        alphaCanvas.patched = tempCanvas;
+                        alphaCanvas.patchedX = alphaCanvas.markedX;
+                        alphaCanvas.patchedY = alphaCanvas.markedY;
+                        image.style.background = '#888888';
+                        image.currentPatch = true;
+                    } else {
+                        alphaCanvas.patched = '';
+                        alphaCanvas.patchedX = '';
+                        alphaCanvas.patchedY = '';
+                        image.style.background = '';
+                        image.currentPatch = '';
+                    }
                 }
 
                 // Import results
@@ -459,12 +480,12 @@ class Script(scripts.Script):
                     for (choice in choices) {
                         if (choices[choice].children && choices[choice].children[0]) {
                             let image2 = new Image();
-                            image2.style.width = '64px';
-                            image2.style.height = '64px';
                             image2.style.display = 'block';
                             image2.style.position = 'relative';
-                            image2.style.padding = '8px';
+                            image2.style.padding = '4px 8px';
                             image2.style.zIndex = '1';
+                            image2.style.background = '';
+                            image2.objectFit = 'contain';
                             alphaSideMenu.append(image2);
                             image2.onload = function() {
                             };
@@ -567,6 +588,7 @@ class Script(scripts.Script):
                         redrawCanvas();
                     }
                 }
+
                 // full window on right click
                 function toggleFullScreen(event) {
                     event.preventDefault();
@@ -735,6 +757,13 @@ class Script(scripts.Script):
                     alphaSideMenu.innerHTML = '';
                     redrawCanvas();
                 }
+
+                // start with 1x1px transparent image to allow selection.
+                initImage = new Image();
+                initImage.onload = function(e) {
+                    loadImage(this);
+                }
+                initImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
             }
             alphaWindow = gradioApp().getElementById('alphaWindow');
             alphaPosition = gradioApp().getElementById('alphaPosition');
