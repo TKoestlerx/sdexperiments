@@ -10,6 +10,17 @@ Copy the file to the scripts-folder from https://github.com/AUTOMATIC1111/stable
 
 Update:
 ========
+Added some gradio styles to the Elements to better blend in.
+
+![alpha4_1](https://user-images.githubusercontent.com/86352149/201878162-28ce9fe5-7e36-4205-a4a4-2f996df4ae49.jpg)
+
+with this change, darkmode should also be supported.
+
+![alpha4_2](https://user-images.githubusercontent.com/86352149/201878350-da9eb5cc-9b09-43e3-b242-751d4a7d05db.jpg)
+
+
+
+
 Added support for width/height definition of the working area using the default gradio sliders
 
 ![alpha3_0](https://user-images.githubusercontent.com/86352149/201469455-e6cc2c8a-25ee-429c-bc1b-cef0b7166af1.jpg)
