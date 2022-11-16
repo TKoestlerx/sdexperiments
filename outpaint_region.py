@@ -417,7 +417,7 @@ class Script(scripts.Script):
                             yMove = 0;
                         }
                         if (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize >newWidth) expandWidth+= (alphaCanvas.patchedX + alphaCanvas.alphaWindowWidth - alphaCanvas.alphaOuterSize) - newWidth;
-                        if (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize >newWidth) expandHeight += (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize) - newHeight;
+                        if (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize >newHeight) expandHeight += (alphaCanvas.patchedY + alphaCanvas.alphaWindowHeight - alphaCanvas.alphaOuterSize) - newHeight;
                         newWidth = newWidth + expandWidth;
                         newHeight = newHeight + expandHeight;
                         const tempCanvas = document.createElement('canvas');
