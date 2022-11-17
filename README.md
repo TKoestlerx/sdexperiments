@@ -11,6 +11,18 @@ Workflow:
 The idea is to take the massive amount of data out of the gradio interface when outpainting or inpainting larger images. You select on the canvas only the region you want to edit or generate. Then you "transfer" this region into the respective interface (img2img or img2img inpaint). 
 When the calculation is done, you get the results and insert them seamlessly (with color correction) into the big image.
 
+Update:
+=======
+If you are starting with the commandLine option "--gradio-img2img-tool color-sketch", a right click on the thumnail will now try to read the sketch back from the gradio interface replacing the original thumbnail.
+
+The Usage would be to select an inpainting region on the canvas, and transfer it to the img2img tab first (with a left click). Then use the gradio sketch tool.
+
+![alpha6_1](https://user-images.githubusercontent.com/86352149/202456947-87f69a01-2397-4319-8a02-50fdcf14135a.jpg)
+
+Then right-click on the thumbnail, storing the sketched image. Change to the inpainting Tab and leftclick the thumbnail to be transfered. Then draw the mask over the sketched area and wait for the results:
+
+![alpha6_2](https://user-images.githubusercontent.com/86352149/202457352-9a0fcb11-bc1c-4ae9-acb3-1cfc34c29181.jpg)
+
 
 UI: 
 ===
