@@ -762,6 +762,7 @@ class Script(scripts.Script):
                             });
                     }
                 }
+                // transfer to gradio.
                 gradioApp().getElementById('alphaItem').onclick= function(e) {
                     sendToGradio();
                     alphaCanvas.markedX = alphaCanvas.lastX;
@@ -770,6 +771,17 @@ class Script(scripts.Script):
                     alphaSideMenu.innerHTML = '';
                     redrawCanvas();
                 }
+                // grab (painted) src back from gradio
+                function grabBack(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    let img2imgImage = gradioApp().getElementById('img2img_image').querySelector('canvas[key="drawing"]');
+                    if (img2imgImage) {
+                        gradioApp().getElementById('alphaItem').src = img2imgImage.toDataURL();
+                    }
+                    return false;
+                }
+                gradioApp().getElementById('alphaItem').addEventListener('contextmenu', grabBack, false);
 
                 // start with 1x1px transparent image to allow selection.
                 initImage = new Image();
