@@ -127,7 +127,7 @@ class Script(scripts.Script):
             return None
 
         canvasButton = gr.Button("Show/Hide AlphaCanvas")
-        SnapGrid = gr.Slider(label="snapGrid", minimum=1, maximum=16, step=1, value=8, elem_id="alphaSnap")
+        SnapGrid = gr.Slider(label="snap Grid", minimum=1, maximum=16, step=1, value=8, elem_id="alphaSnap")
         outerSize = gr.Slider(label="outPaintingSize max", minimum=128, maximum=768, step=128, value=384, elem_id="alphaOutSize")
         outerSizeButton = gr.Button("Update Outpainting Size")
 
@@ -433,7 +433,17 @@ class Script(scripts.Script):
                         alphaCanvas.markedX = ''
                         alphaCanvas.markedY = ''
                         alphaSideMenu.innerHTML = ''
-                        loadImage(tempCanvas);
+                        if (alphaCanvas.lastX) {
+                            let newSelectionX = alphaCanvas.lastX + leftShift;
+                            let newSelectionY = alphaCanvas.lastY + topShift;
+                            loadImage(tempCanvas);
+                            alphaCanvas.lastX = newSelectionX;
+                            alphaCanvas.lastY = newSelectionY;
+                            selectCanvasRegion(newSelectionX,newSelectionY);
+                            redrawCanvas();
+                        } else {
+                            loadImage(tempCanvas);
+                        }
                     }
                 };
                 
@@ -549,6 +559,16 @@ class Script(scripts.Script):
                 alphaCanvas.alphaWindowWidth = parseInt(gradioApp().getElementById('img2img_width').querySelector('input[type="range"]').value);
                 alphaCanvas.alphaWindowHeight = parseInt(gradioApp().getElementById('img2img_height').querySelector('input[type="range"]').value);
                 alphaCanvas.alphaOuterSize = parseInt(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value);
+                function selectCanvasRegion(x, y) {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = alphaCanvas.alphaWindowWidth;
+                    tempCanvas.height = alphaCanvas.alphaWindowHeight;
+                    let ctx2 = tempCanvas.getContext('2d');
+                    if (alphaCanvas.storeImage) {
+                        ctx2.drawImage(alphaCanvas.storeImage, x-alphaCanvas.alphaOuterSize, y-alphaCanvas.alphaOuterSize, tempCanvas.width, tempCanvas.height,0,0,tempCanvas.width,tempCanvas.height);
+                    }
+                    alphaItem.src = tempCanvas.toDataURL('image/png');
+                }
                 alphaCanvas.onclick = function(event) {
                     event.stopPropagation();
                     alphaWindowWidth = parseInt(gradioApp().getElementById('img2img_width').querySelector('input[type="range"]').value);
@@ -567,15 +587,8 @@ class Script(scripts.Script):
                     x = Math.floor(x/alphaSnap) * alphaSnap;
                     y = Math.floor(y/alphaSnap) * alphaSnap;
                     if (x < 0 || y<0) return;
-                    if (x > alphaCanvas.width - alphaCanvas.alphaWindowWidth || y > alphaCanvas.height - alphaCanvas.alphaWindowHeight) return;           
-                    const tempCanvas = document.createElement('canvas');
-                    tempCanvas.width = alphaCanvas.alphaWindowWidth;
-                    tempCanvas.height = alphaCanvas.alphaWindowHeight;
-                    let ctx2 = tempCanvas.getContext('2d');
-                    if (alphaCanvas.storeImage) {
-                        ctx2.drawImage(alphaCanvas.storeImage, x-alphaCanvas.alphaOuterSize, y-alphaCanvas.alphaOuterSize, tempCanvas.width, tempCanvas.height,0,0,tempCanvas.width,tempCanvas.height);
-                    }
-                    alphaItem.src = tempCanvas.toDataURL('image/png');
+                    if (x > alphaCanvas.width - alphaCanvas.alphaWindowWidth || y > alphaCanvas.height - alphaCanvas.alphaWindowHeight) return;
+                    selectCanvasRegion(x,y);
                     alphaCanvas.lastX = x;
                     alphaCanvas.lastY = y;
                     redrawCanvas();
@@ -782,7 +795,7 @@ class Script(scripts.Script):
             
             if (alphaWindow.style.display!=='none') {
                 alphaWindow.style.display = 'none';
-                return gradioApp().getElementById('alphaSnap').querySelector('input[type="range"]').value;
+                return parseFloat(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value);
             }
 
             function resetView() {
@@ -824,7 +837,7 @@ class Script(scripts.Script):
             } else {
                 console.info('failed to get Image data');
             }
-        return gradioApp().getElementById('alphaSnap').querySelector('input[type="range"]').value}"""
+        return parseFloat(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value)}"""
         
         javaScriptFunction2 = """(x2) => {
            let slider = parseFloat(gradioApp().getElementById('alphaOutSize').querySelector('input[type="range"]').value)
@@ -834,7 +847,7 @@ class Script(scripts.Script):
            }
         return slider}"""
 
-        canvasButton.click(None, [], SnapGrid, _js = javaScriptFunction)
+        canvasButton.click(None, [], outerSize, _js = javaScriptFunction)
         outerSizeButton.click(None, [], outerSize, _js = javaScriptFunction2)
         return [canvasButton,outerSize,outerSizeButton,SnapGrid]
 
