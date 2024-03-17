@@ -137,23 +137,23 @@ class Script(scripts.Script):
                 console.info('first run. create Canvas.');
                 let tabDiv = gradioApp().getElementById('tab_img2img');
                 let Outer = document.createElement('div');
-                HTML = `<div id='alphaWindow' style='display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden !important;resize:both;border-radius:5px;border: 1px solid black;' class='gr-panel'>
-                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>A</div>
+                HTML = `<div id='alphaWindow' style='background:#ffffff;display:none;position:absolute;min-width:500px;min-height:200px;z-index:1000;overflow:hidden !important;resize:both;border-radius:5px;border: 1px solid black;' class='gr-panel'>
+                            <div id='alphaPosition' style='left:0px;top:0px;width:30px;height:30px;position:absolute;' class='lg secondary gradio-button svelte-cmf5ev'>A</div>
                             <div id='alphaTitle' style='left:30px;top:0px;right:75px;height:30px;display:block;position:absolute;background:#444444;color:#ffffff;padding-left: 5px;'>AlphaCanvas</div>
-                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;position:absolute' class='gr-button gr-button-lg gr-button-secondary'>Close</div>
+                            <div id='alphaClose' style='right:0px;top:0px;width:75px;height:30px;position:absolute;text-align:center;font-size: 14px;line-height: 20px' class='lg secondary gradio-button svelte-cmf5ev'>Close</div>
                             <input id='alphaFile' style='display:none' type='file'></input>
                             <div id='alphaTopMenu' style='left:0px;top:30px;right:0px;height:80px;display:block;position:absolute;' class='gr-panel'>
                                 <img id='alphaItem' style='left:5px;top:8px;width:64px;height:64px;display:block;position:absolute;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)''/>
-                                <div id='alphaGrab' style='right:0px;top:15px;width:15%;height:40px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Grab Results</div>
-                                <div id='alphaMerge' style='right:20%;top:15px;width:15%;height:40px;position:absolute' class='gr-button gr-button-lg gr-button-secondary'>Apply Patch</div>
+                                <div id='alphaGrab' style='right:0px;top:10px;width:15%;height:60px;position:absolute;text-align:center;font-size: 14px;line-height: 40px' class='lg secondary gradio-button svelte-cmf5ev'>Grab Results</div>
+                                <div id='alphaMerge' style='right:20%;top:10px;width:15%;height:60px;position:absolute;text-align:center;font-size: 14px;line-height: 40px' class='lg secondary gradio-button svelte-cmf5ev'>Apply Patch</div>
                                 <input id='alphaHue' style='left:75px;top:0px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
                                 <div id='alphaHueLabel' style='left:30%;top:0px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>Hue:0</div>
                                 <input id='alphaSaturation' style='left:75px;top:21px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
                                 <div id='alphaSaturationLabel' style='left:30%;top:21px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>S:0</div>
                                 <input id='alphaLightness' style='left:75px;top:42px;right:70%;height:20px;display:block;position:absolute' type='range' min='-0.05', max='0.05', value='0.0' step='0.005'></input>
                                 <div id='alphaLightnessLabel' style='left:30%;top:42px;width:10%;height:20px;display:block;position:absolute;' class='text-gray-500'>L:0</div>
-                                <div id='alphaUpload' style='left:42%;top:1px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Load Canvas</div>
-                                <div id='alphaDownload' style='left:42%;top:41px;width:15%;height:35px;position:absolute;' class='gr-button gr-button-lg gr-button-secondary'>Save Canvas</div>
+                                <div id='alphaUpload' style='left:42%;top:1px;width:18%;height:35px;position:absolute;text-align:center;font-size: 14px' class='lg secondary gradio-button svelte-cmf5ev'>Load Canvas</div>
+                                <div id='alphaDownload' style='left:42%;top:41px;width:18%;height:35px;position:absolute;text-align:center;font-size: 14px' class='lg secondary gradio-button svelte-cmf5ev'>Save Canvas</div>
                             </div>
                             <div id='alphaSideMenu' style='right:0px;top:110px;width:80px;bottom:10px;display:flex;position:absolute;flex-direction:column;overflow-x:hidden !important;overflow-y:auto !important;' class='gr-panel'></div>
                             <div id='alphaCanvasContainer' style='left:0px;top:110px;right:80px;bottom:0px;display:block;position:absolute;overflow:auto;background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAYAAADEUlfTAAAAAXNSR0IArs4c6QAAABtJREFUGFdjTKi+7cuAAzCCJBe0qm7GJj/oJAGwGxoLJP3XYQAAAABJRU5ErkJggg==)'>
@@ -480,15 +480,15 @@ class Script(scripts.Script):
                 // Import results
                 function getImages() {
                     let imgParent = gradioApp().getElementById('img2img_gallery');
-                    let choices_t = imgParent.getElementsByClassName('gallery-item group');
+                    let choices_t = imgParent.getElementsByClassName('grid-container')[0];
     	            if (choices_t.length==0) {
                         console.info('choices empty. Using alternative method');
                         choices_t = imgParent.getElementsByClassName('gallery-item svelte-1g9btlg');
                     }
                     const choices = choices_t;
                     alphaSideMenu.innerHTML = '';
-                    for (choice in choices) {
-                        if (choices[choice].children && choices[choice].children[0]) {
+                    for (let choice=0;choice<choices.children.length;choice++) {
+                        if (choices.children[choice].children && choices.children[choice].children[0]) {
                             let image2 = new Image();
                             image2.style.display = 'block';
                             image2.style.position = 'relative';
@@ -507,7 +507,7 @@ class Script(scripts.Script):
                                     console.info('dont know where to put this region.');
                                 }
                             }
-                            image2.src = choices[choice].children[0].src;
+                            image2.src = choices.children[choice].children[0].src;
                         }
                     }
                 }
@@ -680,13 +680,13 @@ class Script(scripts.Script):
                 // send current Content of 'alphaItem' to the gradio interface.
                 function sendToGradio() {
                     function setDrawMaskMode() {
-                        const modeParent = gradioApp().getElementById('mask_mode');
+                        const modeParent = gradioApp().getElementById('img2img_inpaint_full_res');
                         const currentModes = modeParent.querySelectorAll('input[type="radio"]');
                         currentModes[0].checked = true;
                         currentModes[0].dispatchEvent(new Event('change'));
                     }
                     function setUploadMaskMode() {
-                        const modeParent = gradioApp().getElementById('mask_mode');
+                        const modeParent = gradioApp().getElementById('img2img_inpaint_full_res');
                         const currentModes = modeParent.querySelectorAll('input[type="radio"]');
                         currentModes[1].checked = true;
                         currentModes[1].dispatchEvent(new Event('change'));
@@ -700,7 +700,7 @@ class Script(scripts.Script):
                     let fileString = alphaItem.src;
                     if (!fileString) return;
                     const maskedImage = getImageMask(gradioApp().getElementById('alphaItem'));
-                    if  (get_tab_index('mode_img2img')===1) { // send to Inpaint
+                    if  (get_tab_index('mode_img2img')===4) { // send to Inpaint
                         let imageTarget = gradioApp().getElementById('img2maskimg').querySelector('input[type="file"]');
                         let maskTarget = '';
                         if (maskedImage.length===1) { // real inpainting
@@ -743,6 +743,16 @@ class Script(scripts.Script):
                             function failed(e) {
                             });
                     } else { // send to img2img
+                        let parentName = 'img2img_image'
+                        if  (get_tab_index('mode_img2img')===1) {
+                            parentName = 'img2img_sketch'
+                        }
+                        if  (get_tab_index('mode_img2img')===2) {
+                            parentName = 'img2maskimg'
+                        }
+                        if  (get_tab_index('mode_img2img')===3) {
+                            parentName = 'inpaint_sketch'
+                        }
                         const dt= new DataTransfer()
                         fetch(maskedImage[0]).then(
                             function ok(o) {
@@ -750,7 +760,7 @@ class Script(scripts.Script):
                                     function ok2(o2) {
                                         let file = new File([o2], "transfer.png", { type: 'image/png'})
                                         dt.items.add(file);
-                                        let imgParent = gradioApp().getElementById('img2img_image');
+                                        let imgParent = gradioApp().getElementById(parentName);
                                         const fileInput = imgParent.querySelector('input[type="file"]');
                                         fileInput.files = dt.files;
                                         fileInput.dispatchEvent(new Event('change'));
